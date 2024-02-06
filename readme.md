@@ -1,4 +1,3 @@
-```markdown
 # Proxy App
 
 This is a simple proxy application built with Node.js and Express.js. It allows you to proxy HTTP requests to a specified target URL.
@@ -29,7 +28,7 @@ git clone <repository-url>
 2. Navigate to the project directory:
 
 ```
-cd proxy-app
+cd helsinki-crawler-proxy
 ```
 
 3. Install dependencies:
@@ -86,5 +85,3 @@ This command will send a `HEAD` request to `http://www.google.com` through the p
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-```
-```
