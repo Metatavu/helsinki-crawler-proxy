@@ -9,16 +9,16 @@ const router = express.Router();
 router.head('/', (req: Request, res: Response) => {
     // Send an HTTP 200 response with additional headers
     res.set('Content-Type', 'text/html');
-    res.set('Content-Length', '42337');
+    // res.set('Content-Length', '42337');
     res.set('Accept-Ranges', 'bytes');
-    res.set('Server', 'nginx/1.14.2');
+    // res.set('Server', 'nginx/1.14.2');
     res.set('Date', new Date().toUTCString());
     res.set('Last-Modified', new Date().toUTCString());
-    res.set('ETag', '"61a66613-a561"');
-    res.set('Age', '4');
-    res.set('X-Cache', 'HIT from test-proxy');
-    res.set('X-Cache-Lookup', 'HIT from test-proxy:3128');
-    res.set('Via', '1.1 test-proxy (squid/4.6)');
+    // res.set('ETag', '"61a66613-a561"');
+    // res.set('Age', '4');
+    // res.set('X-Cache', 'HIT from test-proxy');
+    // res.set('X-Cache-Lookup', 'HIT from test-proxy:3128');
+    // res.set('Via', '1.1 test-proxy (squid/4.6)');
     res.set('Connection', 'keep-alive');
 
     res.status(200).end();
@@ -37,23 +37,6 @@ router.get('/', (req: Request, res: Response) => {
 
     console.log('Hostname is ', hostname);
     console.log('Pathname is ', pathname);
-  
-    // Configure options for the HTTP GET request
-    // const options = {
-    //   hostname: `http://${hostname}`, // Use the target hostname as the `hostname
-    //   path: pathname || '',
-    //   method: 'GET',
-    //   headers: req.headers, // Forward headers from the original request
-    // };
-  
-    // // Make HTTP GET request to the target URL
-    // const proxyRequest = http.request(options, (proxyResponse) => {
-    //   // Forward the response status and headers from the target server
-    //   res.writeHead(proxyResponse.statusCode || 200, proxyResponse.headers);
-      
-    //   // Pipe the response body from the target server to the client
-    //   proxyResponse.pipe(res);
-    // });
 
     const proxyRequest = http.get(targetUrl, (response) => {
         let responseBody = '';
@@ -81,45 +64,5 @@ router.get('/', (req: Request, res: Response) => {
     // End the proxy request
     proxyRequest.end();
   });
-
-// router.get('/', (req: Request, res: Response) => {
-//   const target: string = req.query.target as string;
-//   console.log('Proxying to:', target);
-
-//   if (!target) {
-//     return res.status(400).send('Target parameter is missing');
-//   }
-
-//   const proxyOptions: ServerOptions = {
-//     target: target,
-//     auth: `${config.proxy.username}:${config.proxy.password}`,
-//     changeOrigin: true,
-//   };
-
-//   proxy.web(req, res, proxyOptions, (err: Error) => {
-//     console.error('Proxy error:', err);
-//     res.status(500).send('Proxy error');
-//   });
-// });
-
-// router.use(modifyResponseBodyAddElasticName);
-
-// Intercept responses from the target server before sending them back to the client
-// proxy.on('proxyRes', (proxyRes, req: Request, res: Response) => {
-//     return modifyResponseHeaders(proxyRes, req, res);
-// });
-
-// proxy.on('proxyRes', (proxyRes, req: Request, res: Response) => {
-//     // Identify documents requiring custom schema parameters in the response payload
-//     const requiresCustomSchema = /* Add your logic to identify documents */true;
-  
-//     // If the document requires custom schema parameters, modify the response payload
-//     if (requiresCustomSchema) {
-//       // Add custom schema parameters to the response headers or body
-//       res.setHeader('X-Custom-Param', 'value');
-//       // Alternatively, modify the response body
-//       // res.body.customField = 'value';
-//     }
-//   });
 
 export default router;
