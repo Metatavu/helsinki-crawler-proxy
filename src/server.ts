@@ -1,11 +1,13 @@
 import express from "express";
 import proxyRoutes from "./routes/proxy-routes";
+import https from "node:https";
+import config from "./config";
 
 const app = express();
+const server = https.createServer(config.http.ssl, app);
 
 app.use("/", proxyRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Proxy server is running on port ${PORT}`);
+server.listen(config.http.port, () => {
+  console.log(`Proxy server is running on port ${config.http.port}`);
 });

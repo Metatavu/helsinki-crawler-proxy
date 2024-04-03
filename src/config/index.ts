@@ -4,17 +4,17 @@ import { cleanEnv, num, str } from "envalid";
 dotenv.config();
 
 const env = cleanEnv(process.env, {
-  PROXY_HOST: str({ default: "test-proxy.metatavu.io" }),
-  PROXY_PORT: num({ default: 3128 }),
-  PROXY_USERNAME: str({ default: "proxyuser" }),
-  PROXY_PASSWORD: str({ default: "proxypass" }),
+  PORT: num({ default: 3000 }),
+  SSL_KEY: str(),
+  SSL_CERT: str(),
 });
 
-export const config = {
-  proxy: {
-    host: env.PROXY_HOST,
-    port: env.PROXY_PORT,
-    username: env.PROXY_USERNAME,
-    password: env.PROXY_PASSWORD,
+export default {
+  http: {
+    port: env.PORT,
+    ssl: {
+      key: env.SSL_KEY,
+      cert: env.SSL_CERT,
+    },
   },
 };
