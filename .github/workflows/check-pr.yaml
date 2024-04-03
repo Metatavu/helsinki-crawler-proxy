@@ -18,4 +18,4 @@ jobs:
       - name: Run Biome
         run: biome ci .
       - name: Run tests
-        run: npm test
+        run: npm install && npm test
