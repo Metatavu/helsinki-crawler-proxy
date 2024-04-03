@@ -1,5 +1,5 @@
 import express from "express";
-import proxyRoutes from "./src/routes/proxy-routes";
+import proxyRoutes from "./routes/proxy-routes";
 
 const app = express();
 
