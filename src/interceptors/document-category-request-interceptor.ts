@@ -1,7 +1,7 @@
 import type * as cheerio from "cheerio";
-import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
-import HtmlUtils from "../utils/html-utils";
 import { ContentCategory } from "../elastic/types";
+import HtmlUtils from "../utils/html-utils";
+import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 
 export default class DocumentCategoryRequestInterceptor implements AbstractProxyRequestInterceptor {
   /**

@@ -1,6 +1,6 @@
+import * as cheerio from "cheerio";
 import express, { type Request, type Response } from "express";
 import httpProxy from "http-proxy";
-import * as cheerio from "cheerio";
 import interceptors from "../interceptors";
 ("../interceptors");
 

@@ -1,5 +1,5 @@
-import ResourceUtils from "./utils/resource-utils";
 import DocumentCategoryRequestInterceptor from "../src/interceptors/document-category-request-interceptor";
+import ResourceUtils from "./utils/resource-utils";
 
 describe("Add  published request interceptor test suite", () => {
   test("Should intercept urls in hel.fi domain", async () => {
