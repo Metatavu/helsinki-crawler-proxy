@@ -2,10 +2,17 @@ import * as cheerio from "cheerio";
 import express, { type Request, type Response } from "express";
 import httpProxy from "http-proxy";
 import interceptors from "../interceptors";
-("../interceptors");
+import fs from "node:fs";
+import config from "../config";
 
 const router = express.Router();
-const proxy = httpProxy.createProxyServer({});
+const proxy = httpProxy.createProxyServer({
+  ssl: {
+    cert: fs.readFileSync(config.http.ssl.cert, "utf8"),
+    key: fs.readFileSync(config.http.ssl.key, "utf8"),
+  },
+  secure: true,
+});
 
 router.get("/", (req: Request, res: Response) => {
   const { protocol, hostname, pathname, search, hash } = new URL(req.url);
