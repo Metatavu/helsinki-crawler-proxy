@@ -1,27 +1,31 @@
 {
-  "name": "proxy-app",
+  "name": "helsinki-crawler-proxy",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev --respawn --transpile-only server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "build": "tsc",
-    "prod": "npm run build && node dist/server.js"
+    "prod": "npm run build && node dist/server.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.1",
+    "envalid": "^8.0.0",
     "express": "^4.18.2",
-    "http-proxy": "^1.18.1",
-    "node-fetch": "^2.7.0"
+    "http-proxy": "^1.18.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/http-proxy": "^1.17.14",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.11.16",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
