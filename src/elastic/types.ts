@@ -7,5 +7,5 @@ export enum ContentCategory {
   NEWS = "news",
   UNCATEGORIZED = "uncategorized",
   CONTACT = "contact",
-  EXTERNAL = "service_external_link"
-};
+  EXTERNAL = "service_external_link",
+}

@@ -1,5 +1,3 @@
-import NewsPublishedRequestInterceptor from "./news-published-request-interceptor";
+import DocumentCategoryRequestInterceptor from "./document-category-request-interceptor";
 
-export default [
-  new NewsPublishedRequestInterceptor()
-];
+export default [new DocumentCategoryRequestInterceptor()];

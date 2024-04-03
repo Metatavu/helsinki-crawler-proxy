@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as cheerio from 'cheerio';
+import * as fs from "node:fs";
+import * as path from "node:path";
+import * as cheerio from "cheerio";
 
 /**
  * Test resource interface
@@ -8,82 +8,79 @@ import * as cheerio from 'cheerio';
 export interface TestResource {
   url: string;
   $: cheerio.CheerioAPI;
-};
+}
 
 namespace ResourceUtils {
-
   /**
    * Returns test resource for given url
-   * 
+   *
    * @param url url
    * @returns test resource for given url
    */
   export const getTestResourceForUrl = (url: string): TestResource => {
     return {
       url: url,
-      $: loadParsedHtmlResource(`${url.replace("https://", "")}.html`)
+      $: loadParsedHtmlResource(`${url.replace("https://", "")}.html`),
     };
-  }
+  };
 
   /**
    * Loads html resource as string
-   * 
+   *
    * @param resourcePath resource path
    * @returns html resource as string
    */
   export const loadHtmlResource = (resourcePath: string): string => {
-    return fs.readFileSync(path.join(__dirname, "..", "resources", resourcePath), 'utf8');
-  }
+    return fs.readFileSync(path.join(__dirname, "..", "resources", resourcePath), "utf8");
+  };
 
   /**
    * Loads and parses test html resource
-   * 
+   *
    * @param resourcePath resource path
    * @returns parsed html resource
    */
   export const loadParsedHtmlResource = (resourcePath: string): cheerio.CheerioAPI => {
     return cheerio.load(loadHtmlResource(resourcePath));
-  }
+  };
 
   /**
    * Returns list of urls from hel.fi domain with content type tpr_unit
-   * 
+   *
    * @returns list of urls from hel.fi domain with content type tpr_unit
    */
   export const getTestHelFiUnitUrls = () => [
-    "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/perheneuvola/perheneuvola-ruotsinkielinen-palvelu"
-  ]
+    "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/perheneuvola/perheneuvola-ruotsinkielinen-palvelu",
+  ];
 
   /**
    * Returns list of urls from hel.fi domain with content type tpr_service
-   * 
+   *
    * @returns list of urls from hel.fi domain with content type tpr_service
    */
   export const getTestHelFiServiceUrls = () => [
-    "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/lapsiperheiden-sosiaalineuvonta"
-  ]
+    "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/lapsiperheiden-sosiaalineuvonta",
+  ];
 
   /**
    * Returns list of urls from hel.fi domain with content type news_item
-   * 
+   *
    * @returns list of urls from hel.fi domain with content type news_item
    */
   export const getTestHelFiNewsArticleUrls = () => [
-    "https://www.hel.fi/fi/uutiset/kaupunkipyorakausi-alkaa-huhtikuun-alussa-0"
-  ]
+    "https://www.hel.fi/fi/uutiset/kaupunkipyorakausi-alkaa-huhtikuun-alussa-0",
+  ];
 
   /**
    * Returns list of urls from hel.fi domain with content type landing page
-   * 
+   *
    * @returns list of urls from hel.fi domain with content type landing page
    */
-  export const getTestHelFiLandingPageUrls = () => [
-    "https://www.hel.fi/fi/asuminen/vuokra-asunnot"
-  ]
+  export const getTestHelFiLandingPageUrls = () => ["https://www.hel.fi/fi/asuminen/vuokra-asunnot"];
 
   /**
    * Returns list of urls from hel.fi domain
-   * 
+   *
    * @returns list of urls from hel.fi domain
    */
   export const getTestHelFiUrls = () => {
@@ -91,23 +88,23 @@ namespace ResourceUtils {
       ...getTestHelFiUnitUrls(),
       ...getTestHelFiServiceUrls(),
       ...getTestHelFiNewsArticleUrls(),
-      ...getTestHelFiLandingPageUrls()
-    ]
-  }
+      ...getTestHelFiLandingPageUrls(),
+    ];
+  };
 
   /**
    * Returns list of domains outside hel.fi domain
-   * 
+   *
    * @returns list of domains outside hel.fi domain
    */
   export const getOtherTestUrls = () => [
     "https://helsinkipaiva.fi/info/",
-    "https://nuorten.hel.fi/nuorisotalot/arabian-nuorisotalo/"
+    "https://nuorten.hel.fi/nuorisotalot/arabian-nuorisotalo/",
   ];
 
   /**
    * Returns list of malformed urls
-   * 
+   *
    * @returns list of malformed urls
    */
   export const getMalformedUrls = () => [
@@ -130,10 +127,8 @@ namespace ResourceUtils {
     "http://www.example.com/name&value",
     "http://www.example.com.",
     "http://",
-    ""
+    "",
   ];
-
-
-};
+}
 
 export default ResourceUtils;
