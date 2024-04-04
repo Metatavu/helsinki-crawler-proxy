@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - ssl
 
 env:
   REGISTRY: ghcr.io
