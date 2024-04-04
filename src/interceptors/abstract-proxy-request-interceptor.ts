@@ -1,4 +1,5 @@
 import type * as cheerio from "cheerio";
+import { IncomingHttpHeaders } from "http";
 
 /**
  * Interface for proxy request interceptors
@@ -7,15 +8,15 @@ export default interface AbstractProxyRequestInterceptor {
   /**
    * Returns true if the interceptor should intercept the request
    *
-   * @param targetUrl target url
+   * @param headers request headers
    */
-  shouldIntercept(targetUrl: string): boolean;
+  shouldIntercept(headers: IncomingHttpHeaders): boolean;
 
   /**
    * Intercepts the target url. The interceptor should modifies directly the $ instance.
    *
-   * @param targetUrl target url
+   * @param headers request headers
    * @param $ cheerio instance
    */
-  intercept(targetUrl: string, $: cheerio.CheerioAPI): Promise<void>;
+  intercept(headers: IncomingHttpHeaders, $: cheerio.CheerioAPI): Promise<void>;
 }

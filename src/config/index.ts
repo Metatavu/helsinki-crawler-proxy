@@ -4,17 +4,19 @@ import { cleanEnv, num, str } from "envalid";
 dotenv.config();
 
 const env = cleanEnv(process.env, {
-  PORT: num({ default: 3000 }),
+  HTTP_PORT: num({ default: 3000 }),
+  HTTPS_PORT: num({ default: 3443 }),
   SSL_KEY: str(),
   SSL_CERT: str(),
 });
 
 export default {
   http: {
-    port: env.PORT,
-    ssl: {
-      key: env.SSL_KEY,
-      cert: env.SSL_CERT,
-    },
+    port: env.HTTP_PORT
   },
+  https: {
+    port: env.HTTPS_PORT,
+    sslKey: env.SSL_KEY,
+    sslCert: env.SSL_CERT
+  }
 };

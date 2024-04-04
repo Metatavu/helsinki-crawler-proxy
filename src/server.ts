@@ -1,73 +1,46 @@
-import fs from "node:fs";
-import http from "node:http";
 import * as cheerio from "cheerio";
-import HttpProxy from "http-proxy";
-import config from "./config";
+import { IContext, MaybeError, Proxy } from 'http-mitm-proxy';
 import interceptors from "./interceptors";
+import config from "./config";
 
-const sslCert = fs.readFileSync(config.http.ssl.cert, "utf8");
-const sslKey = fs.readFileSync(config.http.ssl.key, "utf8");
+const proxy = new Proxy();
 
-const httpProxy = HttpProxy.createServer({
-  ssl: {
-    cert: sslCert,
-    key: sslKey,
-  },
-  secure: true,
+proxy.onError((_ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
+  console.error('proxy error:', err, errorKind);
 });
 
-http
-  .createServer({}, (req, res) => {
-    console.log("Incoming request");
+proxy.onRequest((ctx, callback) => {
+  const { clientToProxyRequest } = ctx;
+  const { headers } = clientToProxyRequest;
+  const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers));
 
-    const { url } = req;
+  const chunks: Buffer[] = [];
+      
+  ctx.onResponseData((_ctx, chunk, callback) => {
+    chunks.push(chunk);
+    return callback(null, undefined);
+  });
 
-    if (!url) {
-      console.error("Request URL is missing");
-      res.statusCode = 400;
-      res.end("Request URL is missing");
-      return;
+  ctx.onResponseEnd((ctx, callback) => {
+    const body = Buffer.concat(chunks);
+    const $ = cheerio.load(body);
+
+    for (const interceptor of requestInterceptors) {
+      interceptor.intercept(headers, $);
     }
 
-    const { protocol, hostname, pathname, search, hash } = new URL(url);
-    const targetUrl = `${protocol}//${hostname}${pathname}${search}${hash}`;
+    const bodyHtml = $.html();
 
-    console.log("Proxying to:", targetUrl);
+    ctx.proxyToClientResponse.write(bodyHtml);
+    return callback();
+  });
 
-    if (!targetUrl) {
-      console.error("Proxy target URL is missing");
-      res.statusCode = 400;
-      res.end("Proxy target URL is missing");
-      return;
-    }
+  callback();
+});
 
-    const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(targetUrl));
-    if (requestInterceptors.length === 0) {
-      httpProxy.web(req, res, {
-        target: targetUrl,
-      });
-    } else {
-      httpProxy.on("proxyRes", (proxyRes, _req, res) => {
-        const chunks: Buffer[] = [];
-        proxyRes.on("data", (chunk: Buffer) => chunks.push(chunk));
+proxy.listen({
+  port: config.http.port,
+  httpsPort: config.https.port
+});
 
-        proxyRes.on("end", () => {
-          const body = Buffer.concat(chunks);
-          const $ = cheerio.load(body);
-
-          for (const interceptor of requestInterceptors) {
-            interceptor.intercept(targetUrl, $);
-          }
-
-          const bodyHtml = $.html();
-          res.end(bodyHtml);
-        });
-      });
-
-      httpProxy.web(req, res, {
-        target: targetUrl as string,
-        selfHandleResponse: true,
-      });
-    }
-  })
-  .listen(config.http.port, () => console.log(`Proxy server is running on port ${config.http.port}`));
+console.log(`HTTP Proxy listening on port ${config.http.port}, HTTPS Proxy listening on port ${config.https.port}`);

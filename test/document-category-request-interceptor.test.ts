@@ -6,7 +6,8 @@ describe("Add  published request interceptor test suite", () => {
     const interceptor = new DocumentCategoryRequestInterceptor();
 
     for (const url of ResourceUtils.getTestHelFiUrls()) {
-      expect(interceptor.shouldIntercept(url)).toBe(true);
+      const headers = ResourceUtils.getRequestHeadersForUrl(url);
+      expect(interceptor.shouldIntercept(headers)).toBe(true);
     }
   });
 
@@ -14,15 +15,8 @@ describe("Add  published request interceptor test suite", () => {
     const interceptor = new DocumentCategoryRequestInterceptor();
 
     for (const url of ResourceUtils.getOtherTestUrls()) {
-      expect(interceptor.shouldIntercept(url)).toBe(false);
-    }
-  });
-
-  test("Should not intercept with malformed URLs", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
-
-    for (const url of ResourceUtils.getMalformedUrls()) {
-      expect(interceptor.shouldIntercept(url)).toBe(false);
+      const headers = ResourceUtils.getRequestHeadersForUrl(url);
+      expect(interceptor.shouldIntercept(headers)).toBe(false);
     }
   });
 
@@ -33,7 +27,8 @@ describe("Add  published request interceptor test suite", () => {
     const results = await Promise.all(
       testNewsUrls.map(async (url) => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
-        await interceptor.intercept(url, $);
+        const headers = ResourceUtils.getRequestHeadersForUrl(url);
+        await interceptor.intercept(headers, $);
         expect($('head>meta[name="elastic:category"]').attr("content")).toBe("news");
       }),
     );
@@ -48,7 +43,8 @@ describe("Add  published request interceptor test suite", () => {
     const results = await Promise.all(
       testServiceUrls.map(async (url) => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
-        await interceptor.intercept(url, $);
+        const headers = ResourceUtils.getRequestHeadersForUrl(url);
+        await interceptor.intercept(headers, $);
         expect($('head>meta[name="elastic:category"]').attr("content")).toBe("service");
       }),
     );
@@ -63,7 +59,8 @@ describe("Add  published request interceptor test suite", () => {
     const results = await Promise.all(
       testUnitUrls.map(async (url) => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
-        await interceptor.intercept(url, $);
+        const headers = ResourceUtils.getRequestHeadersForUrl(url);
+        await interceptor.intercept(headers, $);
         expect($('head>meta[name="elastic:category"]').attr("content")).toBe("unit");
       }),
     );
@@ -78,7 +75,8 @@ describe("Add  published request interceptor test suite", () => {
     const results = await Promise.all(
       testLandingUrls.map(async (url) => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
-        await interceptor.intercept(url, $);
+        const headers = ResourceUtils.getRequestHeadersForUrl(url);
+        await interceptor.intercept(headers, $);
         expect($('head>meta[name="elastic:category"]').attr("content")).toBe("uncategorized");
       }),
     );

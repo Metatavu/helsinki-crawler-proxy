@@ -45,6 +45,18 @@ namespace ResourceUtils {
   };
 
   /**
+   * Get request headers for given url
+   * 
+   * @param url url 
+   * @returns request headers for given url
+   */
+  export const getRequestHeadersForUrl = (url: string) => {
+    return {
+      host: new URL(url).host,
+    };
+  };
+
+  /**
    * Returns list of urls from hel.fi domain with content type tpr_unit
    *
    * @returns list of urls from hel.fi domain with content type tpr_unit
