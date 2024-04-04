@@ -39,6 +39,7 @@ proxy.onRequest((ctx, callback) => {
 });
 
 proxy.listen({
+  host: '::',
   port: config.http.port,
   httpsPort: config.https.port
 });
