@@ -14,7 +14,9 @@ const httpProxy = HttpProxy.createServer({
     key: sslKey,
   },
   secure: true,
-});
+}).listen(config.http.port);
+
+/**
 
 https
   .createServer(
@@ -75,3 +77,4 @@ https
     },
   )
   .listen(config.http.port, () => console.log("Proxy server is running on port $config.http.port"));
+ */
