@@ -40,7 +40,7 @@ jobs:
           zone: ${{ secrets.GCLOUD_ZONE }}
           ssh_private_key: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
           command: 'tail -f /etc/hosts'
-          flags: "-L 2222:localhost:8080"
+          flags: "-L2222:localhost:8080 -vvv"
 
       - uses: actions-hub/kubectl@master
         env:
