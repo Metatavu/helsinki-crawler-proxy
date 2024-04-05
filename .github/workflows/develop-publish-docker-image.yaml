@@ -26,6 +26,20 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
 
+      - id: 'gcloud-ssh'
+        uses: 'google-github-actions/ssh-compute@v1'
+        with:
+          instance_name: ${{ secrets.GCLOUD_INSTANCE_NAME }}
+          zone: ${{ secrets.GCLOUD_ZONE }}
+          ssh_private_key: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
+          command: 'echo Hello world'
+
+      # Example of using the output
+      - id: 'test'
+        run: |-
+          echo '${{ steps.compute-ssh.outputs.stdout }}'
+          echo '${{ steps.compute-ssh.outputs.stderr }}'          
+
       - name: 'Set up gcloud CLI'
         uses: 'google-github-actions/setup-gcloud@v2'
 
