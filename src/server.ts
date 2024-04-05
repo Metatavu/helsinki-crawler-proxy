@@ -2,8 +2,8 @@ import * as cheerio from "cheerio";
 import { IContext, MaybeError, Proxy } from 'http-mitm-proxy';
 import interceptors from "./interceptors";
 import config from "./config";
-
-const proxy = new Proxy();
+import fs from "node:fs";
+import path from "node:path";
 
 /**
  * Log a message to the console
@@ -24,10 +24,43 @@ const log = (level: "error" | "info" | "debug", message: string) => {
 }
 
 /**
+ * Load the CA certificate and keys
+ */
+const loadCaCertificate = () => {
+  const caCertificate = fs.readFileSync(config.ca.certificate, "utf8");
+  const caPrivateKey = fs.readFileSync(config.ca.privateKey, "utf8");
+  const caPublicKey = fs.readFileSync(config.ca.publicKey, "utf8");
+  const caFolder = config.ca.cacheDir;
+  const certsFolder = path.join(caFolder, "certs");
+  const keysFolder = path.join(caFolder, "keys");
+
+  for (const folder of [caFolder, certsFolder, keysFolder]) {
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder);
+    }
+  }
+
+  fs.writeFileSync(`${certsFolder}/ca.pem`, caCertificate);
+  fs.writeFileSync(`${keysFolder}/ca.private.key`, caPrivateKey);
+  fs.writeFileSync(`${keysFolder}/ca.public.key`, caPublicKey);
+}
+
+loadCaCertificate();
+const proxy = new Proxy();
+
+/**
  * Proxy error handler
  */
-proxy.onError((_ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
-  log("error", `proxy error: ${err}, ${errorKind}`);
+proxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
+  if (!err) {
+    return;
+  }
+
+  const host = ctx?.clientToProxyRequest.headers.host;
+  const url = ctx?.clientToProxyRequest.url;
+  const requestUrl = host && url ? `${host}${url}` : "unknown";
+
+  log("error", `proxy error: ${err} (${errorKind}) for ${requestUrl}`);
 });
 
 /**
@@ -36,8 +69,9 @@ proxy.onError((_ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
 proxy.onRequest((ctx, callback) => {
   const host = ctx.clientToProxyRequest.headers.host;
   const url = ctx.clientToProxyRequest.url;
+  const requestUrl = `${host}${url}`;
 
-  log("debug", `Request to: ${host}${url}`);
+  log("debug", `Request to: ${requestUrl}`);
 
   const { clientToProxyRequest } = ctx;
   const { headers } = clientToProxyRequest;
@@ -83,7 +117,8 @@ proxy.onRequest((ctx, callback) => {
 proxy.listen({
   host: '::',
   port: config.http.port,
-  httpsPort: config.https.port
+  httpsPort: config.https.port,
+  sslCaDir: config.ca.cacheDir,
 });
 
 console.log(`HTTP Proxy listening on port ${config.http.port}, HTTPS Proxy listening on port ${config.https.port}`);
