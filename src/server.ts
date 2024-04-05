@@ -10,6 +10,8 @@ proxy.onError((_ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
 });
 
 proxy.onRequest((ctx, callback) => {
+  console.log(`Request: ${ctx.clientToProxyRequest.url}`);
+
   const { clientToProxyRequest } = ctx;
   const { headers } = clientToProxyRequest;
   const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers));
@@ -17,6 +19,7 @@ proxy.onRequest((ctx, callback) => {
   const chunks: Buffer[] = [];
       
   ctx.onResponseData((_ctx, chunk, callback) => {
+    console.log(`Response data: ${chunk.length} bytes`);
     chunks.push(chunk);
     return callback(null, undefined);
   });
@@ -32,6 +35,9 @@ proxy.onRequest((ctx, callback) => {
     const bodyHtml = $.html();
 
     ctx.proxyToClientResponse.write(bodyHtml);
+
+    console.log(`Response end. Sending total of ${bodyHtml.length} bytes to client.`);
+
     return callback();
   });
 
