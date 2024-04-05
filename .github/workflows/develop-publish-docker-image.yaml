@@ -41,10 +41,10 @@ jobs:
           chmod 400 key.pub
 
       - name: 'Start SSH tunnel'
-        run: 'gcloud compute ssh helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "tail -f /etc/hosts" -- -N -L 6443:localhost:6443 &'
+        run: 'gcloud compute ssh helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --troubleshoot --tunnel-through-iap --command "tail -f /etc/hosts" -- -N -L 6443:localhost:6443 &'
 
       - name: 'Wait for SSH tunnel to start'
-        run: 'sleep 10'
+        run: 'sleep 20'
       
       - uses: actions-hub/kubectl@master
         env:
