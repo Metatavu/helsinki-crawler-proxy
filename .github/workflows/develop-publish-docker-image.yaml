@@ -29,13 +29,10 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
 
-      - id: 'gcloud-ssh'
-        uses: 'google-github-actions/ssh-compute@v1'
-        with:
-          instance_name: ${{ secrets.GCLOUD_INSTANCE_NAME }}
-          zone: ${{ secrets.GCLOUD_ZONE }}
-          ssh_private_key: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
-          command: 'tail -f /dev/null'
+      - name: 'Use gcloud CLI'
+        env:
+          GCLOUD_SSH_PRIVATE_KEY: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
+        run: 'echo $GCLOUD_SSH_PRIVATE_KEY > ~/.ssh/google_compute_engine && gcloud compute ssh ${{ secrets.GCLOUD_INSTANCE_NAME }} --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --command "tail -f /dev/null" -- -L 6443:localhost:6443 &'
 
       - uses: actions-hub/kubectl@master
         env:
