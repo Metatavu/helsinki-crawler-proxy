@@ -35,7 +35,7 @@ jobs:
           instance_name: ${{ secrets.GCLOUD_INSTANCE_NAME }}
           zone: ${{ secrets.GCLOUD_ZONE }}
           ssh_private_key: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
-          ssh_args: -L 6443:localhost:6443
+          ssh_args: '-L 6443:localhost:6443'
           command: 'echo Hello world'
 
       - uses: actions-hub/kubectl@master
