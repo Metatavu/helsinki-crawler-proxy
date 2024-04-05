@@ -36,7 +36,7 @@ jobs:
           zone: ${{ secrets.GCLOUD_ZONE }}
           ssh_private_key: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
           ssh_args: -L 6443:localhost:6443
-          command: "tail -f /dev/null"
+          command: 'echo Hello world'
 
       - uses: actions-hub/kubectl@master
         env:
