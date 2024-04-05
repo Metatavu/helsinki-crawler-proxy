@@ -19,6 +19,9 @@ jobs:
       packages: write
       id-token: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: 'Setup gcloud auth'
         id: 'gcloud-auth'
         uses: 'google-github-actions/auth@v2'
@@ -32,13 +35,13 @@ jobs:
           instance_name: ${{ secrets.GCLOUD_INSTANCE_NAME }}
           zone: ${{ secrets.GCLOUD_ZONE }}
           ssh_private_key: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
-          command: 'echo Hello world'
+          ssh_args: -L 6443:localhost:6443
 
-      # Example of using the output
-      - id: 'test'
-        run: |-
-          echo '${{ steps.compute-ssh.outputs.stdout }}'
-          echo '${{ steps.compute-ssh.outputs.stderr }}'          
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+          args: get pods
 
       - name: 'Set up gcloud CLI'
         uses: 'google-github-actions/setup-gcloud@v2'
