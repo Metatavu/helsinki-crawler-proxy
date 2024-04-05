@@ -5,12 +5,39 @@ import config from "./config";
 
 const proxy = new Proxy();
 
+/**
+ * Log a message to the console
+ * 
+ * @param level logging level
+ * @param message message to log
+ */
+const log = (level: "error" | "info" | "debug", message: string) => {
+  if (level === "debug" && config.logging.level !== "debug") {
+    return;
+  }
+
+  if (level === "error") {
+    console.error(`[${level}] ${message}`);
+  } else {
+    console.log(`[${level}] ${message}`);
+  }
+}
+
+/**
+ * Proxy error handler
+ */
 proxy.onError((_ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
-  console.error('proxy error:', err, errorKind);
+  log("error", `proxy error: ${err}, ${errorKind}`);
 });
 
+/**
+ * Proxy request handler
+ */
 proxy.onRequest((ctx, callback) => {
-  console.log(`Request: ${ctx.clientToProxyRequest.url}`);
+  const host = ctx.clientToProxyRequest.headers.host;
+  const url = ctx.clientToProxyRequest.url;
+
+  log("debug", `Request to: ${host}${url}`);
 
   const { clientToProxyRequest } = ctx;
   const { headers } = clientToProxyRequest;
@@ -19,24 +46,33 @@ proxy.onRequest((ctx, callback) => {
   const chunks: Buffer[] = [];
       
   ctx.onResponseData((_ctx, chunk, callback) => {
-    console.log(`Response data: ${chunk.length} bytes`);
     chunks.push(chunk);
     return callback(null, undefined);
   });
 
   ctx.onResponseEnd((ctx, callback) => {
-    const body = Buffer.concat(chunks);
-    const $ = cheerio.load(body);
+    const responseHeaders = ctx.serverToProxyResponse?.headers;
+    const responseBody =  Buffer.concat(chunks);
+    const resnposeStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
+    const responseContentType = responseHeaders?.["content-type"];
+    const responseIsOk = resnposeStatusCode >= 200 && resnposeStatusCode <= 299;
+    const responseIsHtml = responseContentType && responseContentType.includes("text/html");
 
-    for (const interceptor of requestInterceptors) {
-      interceptor.intercept(headers, $);
+    log("debug", `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`);
+
+    if (responseIsOk && responseIsHtml) {
+      const $ = cheerio.load(responseBody);
+
+      for (const interceptor of requestInterceptors) {
+        interceptor.intercept(headers, $);
+      }
+
+      const bodyHtml = $.html();
+
+      ctx.proxyToClientResponse.write(bodyHtml);
+    } else {
+      ctx.proxyToClientResponse.write(responseBody);
     }
-
-    const bodyHtml = $.html();
-
-    ctx.proxyToClientResponse.write(bodyHtml);
-
-    console.log(`Response end. Sending total of ${bodyHtml.length} bytes to client.`);
 
     return callback();
   });

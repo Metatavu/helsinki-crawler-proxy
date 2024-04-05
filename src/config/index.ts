@@ -8,9 +8,13 @@ const env = cleanEnv(process.env, {
   HTTPS_PORT: num({ default: 3443 }),
   SSL_KEY: str(),
   SSL_CERT: str(),
+  LOGGING_LEVEL: str({ default: "info" })
 });
 
 export default {
+  logging: {
+    level: env.LOGGING_LEVEL
+  },
   http: {
     port: env.HTTP_PORT
   },
