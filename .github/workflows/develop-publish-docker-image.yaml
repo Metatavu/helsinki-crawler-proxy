@@ -22,36 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 'Setup gcloud auth'
-        id: 'gcloud-auth'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
-
-      - name: "Setup gcloud CLI" 
-        id: 'gcloud-setup'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: "Decrypt SSH key"
-        run: |
-          echo "${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}" | base64 --decode > key && 
-          echo "${{ secrets.GCLOUD_SSH_PUBLIC_KEY }}" | base64 --decode > key.pub && 
-          chmod 400 key && 
-          chmod 400 key.pub
-
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        with:
-          args: get pods
-
-      - name: 'Set up gcloud CLI'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: 'Test gcloud CLI'
-        run: 'gcloud info'
-
       - name: Resolve docker image name
         id: image_name
         run: |
@@ -81,6 +51,27 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: 'Setup gcloud auth'
+        id: 'gcloud-auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
+
+      - name: "Setup gcloud CLI" 
+        id: 'gcloud-setup'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: "Decrypt SSH key"
+        run: |
+          echo "${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}" | base64 --decode > key && 
+          echo "${{ secrets.GCLOUD_SSH_PUBLIC_KEY }}" | base64 --decode > key.pub && 
+          chmod 400 key && 
+          chmod 400 key.pub
+
+      - name: 'Set up gcloud CLI'
+        uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: 'Update deployment'
         run: 'gcloud compute ssh helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "/home/anttileppa/update/update.sh ${{ github.ref_name }} staging ${{ steps.dockerpush.outputs.digest }}"'
