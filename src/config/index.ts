@@ -10,7 +10,9 @@ const env = cleanEnv(process.env, {
   CA_CACHE_DIR: str(),
   CA_CERTIFICATE: str(),
   CA_PRIVATE_KEY: str(),
-  CA_PUBLIC_KEY: str()
+  CA_PUBLIC_KEY: str(),
+  USERNAME: str(),
+  PASSWORD: str()
 });
 
 export default {
@@ -28,5 +30,9 @@ export default {
     certificate: env.CA_CERTIFICATE,
     privateKey: env.CA_PRIVATE_KEY,
     publicKey: env.CA_PUBLIC_KEY
+  },
+  security: {
+    username: env.USERNAME,
+    password: env.PASSWORD
   }
 };

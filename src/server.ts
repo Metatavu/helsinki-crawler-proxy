@@ -64,6 +64,28 @@ proxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
 });
 
 /**
+ * Proxy connect handler. Method is used to authenticate the user
+ */
+proxy.onConnect((req, socket, _head, callback) => {
+  const proxyAuth = req.headers['proxy-authorization'] || '';
+  const [type, encoded] = proxyAuth.split(' ');
+
+  if (type.toLowerCase() === 'basic') {
+    const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+    const [username, password] = decoded.split(':');
+
+    if (username === config.security.username && password === config.security.password) {
+      return callback();
+    }
+  }
+
+  socket.write('HTTP/1.1 407 Proxy Authentication Required\r\n');
+  socket.write('Proxy-Authenticate: Basic realm="Helsinki Crawler Proxy"\r\n');
+  socket.write('\r\n');
+  socket.end();
+});
+
+/**
  * Proxy request handler
  */
 proxy.onRequest((ctx, callback) => {
@@ -119,6 +141,7 @@ proxy.listen({
   port: config.http.port,
   httpsPort: config.https.port,
   sslCaDir: config.ca.cacheDir,
+
 });
 
 console.log(`HTTP Proxy listening on port ${config.http.port}, HTTPS Proxy listening on port ${config.https.port}`);
