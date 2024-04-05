@@ -29,6 +29,10 @@ jobs:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
 
+      - name: "Setup gcloud CLI" 
+        id: 'gcloud-setup'
+        uses: 'google-github-actions/setup-gcloud@v2'
+      
       - id: 'gcloud-ssh'
         uses: 'google-github-actions/ssh-compute@v1'
         with:
