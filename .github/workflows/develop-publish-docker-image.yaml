@@ -34,6 +34,9 @@ jobs:
           GCLOUD_SSH_PRIVATE_KEY: ${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}
         run: 'mkdir -p ~/.ssh && echo $GCLOUD_SSH_PRIVATE_KEY > ~/.ssh/google_compute_engine && gcloud compute ssh ${{ secrets.GCLOUD_INSTANCE_NAME }} --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --command "tail -f /dev/null" -- -L 6443:localhost:6443 &'
 
+      - name: 'Wait for SSH'
+        run: 'sleep 10'
+
       - uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
