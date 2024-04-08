@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import * as cheerio from "cheerio";
-import { type IContext, type MaybeError, Proxy } from "http-mitm-proxy";
+import { type IContext, type MaybeError, Proxy as MitmProxy } from "http-mitm-proxy";
 import config from "./config";
 import interceptors from "./interceptors";
 
@@ -46,12 +46,12 @@ const loadCaCertificate = () => {
 };
 
 loadCaCertificate();
-const proxy = new Proxy();
+const mitmProxy = new MitmProxy();
 
 /**
  * Proxy error handler
  */
-proxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
+mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
   if (!err) {
     return;
   }
@@ -66,7 +66,7 @@ proxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
 /**
  * Proxy connect handler. Method is used to authenticate the user
  */
-proxy.onConnect((req, socket, _head, callback) => {
+mitmProxy.onConnect((req, socket, _head, callback) => {
   const proxyAuth = req.headers["proxy-authorization"] || "";
   const [type, encoded] = proxyAuth.split(" ");
 
@@ -88,7 +88,7 @@ proxy.onConnect((req, socket, _head, callback) => {
 /**
  * Proxy request handler
  */
-proxy.onRequest((ctx, callback) => {
+mitmProxy.onRequest((ctx, callback) => {
   const host = ctx.clientToProxyRequest.headers.host;
   const url = ctx.clientToProxyRequest.url;
   const requestUrl = `${host}${url}`;
@@ -112,7 +112,7 @@ proxy.onRequest((ctx, callback) => {
     const resnposeStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
     const responseContentType = responseHeaders?.["content-type"];
     const responseIsOk = resnposeStatusCode >= 200 && resnposeStatusCode <= 299;
-    const responseIsHtml = responseContentType && responseContentType.includes("text/html");
+    const responseIsHtml = responseContentType?.includes("text/html");
 
     log(
       "debug",
@@ -139,7 +139,7 @@ proxy.onRequest((ctx, callback) => {
   callback();
 });
 
-proxy.listen({
+mitmProxy.listen({
   host: "::",
   port: config.http.port,
   httpsPort: config.https.port,

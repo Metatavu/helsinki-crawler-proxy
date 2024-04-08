@@ -1,4 +1,4 @@
-import type { IncomingHttpHeaders } from "http";
+import type { IncomingHttpHeaders } from "node:http";
 import type * as cheerio from "cheerio";
 import { ContentCategory } from "../elastic/types";
 import HtmlUtils from "../utils/html-utils";
