@@ -1,9 +1,9 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type * as cheerio from "cheerio";
-import HtmlUtils from "../utils/html-utils";
-import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 import { DateTime } from "luxon";
 import Logging from "../logging";
+import HtmlUtils from "../utils/html-utils";
+import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 
 /**
  * News published request interceptor.
