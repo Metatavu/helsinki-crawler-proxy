@@ -22,7 +22,7 @@ spec:
         app: {{ .Release.Name }}-helsinki-crawler-proxy
     spec:
       containers:
-      - image: {{ .Values.image.repository }}@sha256:{{ .Values.image.sha256 }}
+      - image: {{ .Values.image.repository }}@{{ .Values.image.sha256 }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: {{ .Release.Name }}-helsinki-crawler-proxy
         env:
