@@ -7,7 +7,7 @@ const env = cleanEnv(process.env, {
   HTTP_PORT: num({ default: 3000 }),
   HTTPS_PORT: num({ default: 3443 }),
   LOGGING_LEVEL: str({ default: "info" }),
-  CA_CACHE_DIR: str({ devDefault: "/tmp/ca" }),
+  CA_CACHE_DIR: str({ default: undefined }),
   CA_CERTIFICATE: str({ devDefault: "/tmp/ca/cert.pem" }),
   CA_PRIVATE_KEY: str({ devDefault: "/tmp/ca/key.pem" }),
   CA_PUBLIC_KEY: str({ devDefault: "/tmp/ca/public.pem" }),

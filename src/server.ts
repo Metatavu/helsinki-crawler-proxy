@@ -10,10 +10,15 @@ import Logging from "./logging";
  * Load the CA certificate and keys
  */
 const loadCaCertificate = () => {
+  const caFolder = config.ca.cacheDir;
+  if (!caFolder) {
+    Logging.log("info", "CA cache directory not defined. Using generated certificates.");
+    return;
+  }
+
   const caCertificate = fs.readFileSync(config.ca.certificate, "utf8");
   const caPrivateKey = fs.readFileSync(config.ca.privateKey, "utf8");
   const caPublicKey = fs.readFileSync(config.ca.publicKey, "utf8");
-  const caFolder = config.ca.cacheDir;
   const certsFolder = path.join(caFolder, "certs");
   const keysFolder = path.join(caFolder, "keys");
 
