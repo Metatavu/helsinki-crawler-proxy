@@ -29,7 +29,8 @@ describe("Add  published request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="elastic:category"]').attr("content")).toBe("news");
+        expect($('head>meta[name="category"]').attr("content")).toBe("news");
+        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
     );
 
@@ -45,7 +46,8 @@ describe("Add  published request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="elastic:category"]').attr("content")).toBe("service");
+        expect($('head>meta[name="category"]').attr("content")).toBe("service");
+        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
     );
 
@@ -61,7 +63,8 @@ describe("Add  published request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="elastic:category"]').attr("content")).toBe("unit");
+        expect($('head>meta[name="category"]').attr("content")).toBe("unit");
+        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
     );
 
@@ -77,7 +80,8 @@ describe("Add  published request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="elastic:category"]').attr("content")).toBe("uncategorized");
+        expect($('head>meta[name="category"]').attr("content")).toBe("uncategorized");
+        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
     );
 

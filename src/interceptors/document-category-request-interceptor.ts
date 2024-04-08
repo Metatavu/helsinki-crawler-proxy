@@ -29,7 +29,7 @@ export default class DocumentCategoryRequestInterceptor implements AbstractProxy
     const helfiContentType = HtmlUtils.getMetaTag($, "helfi_content_type");
     const contentCategory = this.getContentCategory(helfiContentType);
 
-    HtmlUtils.setMetaTag($, "elastic:category", contentCategory);
+    HtmlUtils.setMetaTag($, "category", contentCategory, "elastic");
   };
 
   /**

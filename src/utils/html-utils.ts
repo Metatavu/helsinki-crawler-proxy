@@ -21,13 +21,20 @@ namespace HtmlUtils {
    * @param $ cheerio instance
    * @param name meta tag name
    * @param content meta tag content
+   * @param className optional class name for the meta tag
    */
-  export const setMetaTag = ($: cheerio.CheerioAPI, name: string, content: string) => {
+  export const setMetaTag = ($: cheerio.CheerioAPI, name: string, content: string, className?: string) => {
     const metaTag = $(`head>meta[name="${name}"]`);
+    let element = null;
+
     if (metaTag.length) {
-      metaTag.attr("content", content);
+      element = metaTag.attr("content", content);
     } else {
-      $("<meta>").attr("name", name).attr("content", content).appendTo("head");
+      element = $("<meta>").attr("name", name).attr("content", content).appendTo("head");
+    }
+
+    if (className) {
+      element.addClass(className);
     }
   };
 }
