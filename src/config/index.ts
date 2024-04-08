@@ -11,8 +11,8 @@ const env = cleanEnv(process.env, {
   CA_CERTIFICATE: str({ devDefault: "/tmp/ca/cert.pem" }),
   CA_PRIVATE_KEY: str({ devDefault: "/tmp/ca/key.pem" }),
   CA_PUBLIC_KEY: str({ devDefault: "/tmp/ca/public.pem" }),
-  USERNAME: str({ devDefault: "proxy" }),
-  PASSWORD: str({ devDefault: "pass" }),
+  USERNAME: str({ default: undefined }),
+  PASSWORD: str({ default: undefined }),
 });
 
 export default {

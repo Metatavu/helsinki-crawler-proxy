@@ -51,27 +51,29 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
   Logging.log("error", `proxy error: ${err} (${errorKind}) for ${requestUrl}`);
 });
 
-/**
- * Proxy connect handler. Method is used to authenticate the user
- */
-mitmProxy.onConnect((req, socket, _head, callback) => {
-  const proxyAuth = req.headers["proxy-authorization"] || "";
-  const [type, encoded] = proxyAuth.split(" ");
+if (config.security.username && config.security.password) {
+  /**
+   * Proxy connect handler. Method is used to authenticate the user
+   */
+  mitmProxy.onConnect((req, socket, _head, callback) => {
+    const proxyAuth = req.headers["proxy-authorization"] || "";
+    const [type, encoded] = proxyAuth.split(" ");
 
-  if (type.toLowerCase() === "basic") {
-    const decoded = Buffer.from(encoded, "base64").toString("utf8");
-    const [username, password] = decoded.split(":");
+    if (type.toLowerCase() === "basic") {
+      const decoded = Buffer.from(encoded, "base64").toString("utf8");
+      const [username, password] = decoded.split(":");
 
-    if (username === config.security.username && password === config.security.password) {
-      return callback();
+      if (username === config.security.username && password === config.security.password) {
+        return callback();
+      }
     }
-  }
 
-  socket.write("HTTP/1.1 407 Proxy Authentication Required\r\n");
-  socket.write('Proxy-Authenticate: Basic realm="Helsinki Crawler Proxy"\r\n');
-  socket.write("\r\n");
-  socket.end();
-});
+    socket.write("HTTP/1.1 407 Proxy Authentication Required\r\n");
+    socket.write('Proxy-Authenticate: Basic realm="Helsinki Crawler Proxy"\r\n');
+    socket.write("\r\n");
+    socket.end();
+  });
+}
 
 /**
  * Proxy request handler
