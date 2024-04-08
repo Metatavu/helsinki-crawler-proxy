@@ -12,27 +12,27 @@ const env = cleanEnv(process.env, {
   CA_PRIVATE_KEY: str(),
   CA_PUBLIC_KEY: str(),
   USERNAME: str(),
-  PASSWORD: str()
+  PASSWORD: str(),
 });
 
 export default {
   logging: {
-    level: env.LOGGING_LEVEL
+    level: env.LOGGING_LEVEL,
   },
   http: {
-    port: env.HTTP_PORT
+    port: env.HTTP_PORT,
   },
   https: {
-    port: env.HTTPS_PORT
+    port: env.HTTPS_PORT,
   },
   ca: {
     cacheDir: env.CA_CACHE_DIR,
     certificate: env.CA_CERTIFICATE,
     privateKey: env.CA_PRIVATE_KEY,
-    publicKey: env.CA_PUBLIC_KEY
+    publicKey: env.CA_PUBLIC_KEY,
   },
   security: {
     username: env.USERNAME,
-    password: env.PASSWORD
-  }
+    password: env.PASSWORD,
+  },
 };

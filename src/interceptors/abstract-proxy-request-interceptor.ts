@@ -1,5 +1,5 @@
+import type { IncomingHttpHeaders } from "http";
 import type * as cheerio from "cheerio";
-import { IncomingHttpHeaders } from "http";
 
 /**
  * Interface for proxy request interceptors

@@ -46,8 +46,8 @@ namespace ResourceUtils {
 
   /**
    * Get request headers for given url
-   * 
-   * @param url url 
+   *
+   * @param url url
    * @returns request headers for given url
    */
   export const getRequestHeadersForUrl = (url: string) => {

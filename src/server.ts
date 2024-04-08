@@ -1,13 +1,13 @@
-import * as cheerio from "cheerio";
-import { IContext, MaybeError, Proxy } from 'http-mitm-proxy';
-import interceptors from "./interceptors";
-import config from "./config";
 import fs from "node:fs";
 import path from "node:path";
+import * as cheerio from "cheerio";
+import { type IContext, type MaybeError, Proxy } from "http-mitm-proxy";
+import config from "./config";
+import interceptors from "./interceptors";
 
 /**
  * Log a message to the console
- * 
+ *
  * @param level logging level
  * @param message message to log
  */
@@ -21,7 +21,7 @@ const log = (level: "error" | "info" | "debug", message: string) => {
   } else {
     console.log(`[${level}] ${message}`);
   }
-}
+};
 
 /**
  * Load the CA certificate and keys
@@ -43,7 +43,7 @@ const loadCaCertificate = () => {
   fs.writeFileSync(`${certsFolder}/ca.pem`, caCertificate);
   fs.writeFileSync(`${keysFolder}/ca.private.key`, caPrivateKey);
   fs.writeFileSync(`${keysFolder}/ca.public.key`, caPublicKey);
-}
+};
 
 loadCaCertificate();
 const proxy = new Proxy();
@@ -67,21 +67,21 @@ proxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
  * Proxy connect handler. Method is used to authenticate the user
  */
 proxy.onConnect((req, socket, _head, callback) => {
-  const proxyAuth = req.headers['proxy-authorization'] || '';
-  const [type, encoded] = proxyAuth.split(' ');
+  const proxyAuth = req.headers["proxy-authorization"] || "";
+  const [type, encoded] = proxyAuth.split(" ");
 
-  if (type.toLowerCase() === 'basic') {
-    const decoded = Buffer.from(encoded, 'base64').toString('utf8');
-    const [username, password] = decoded.split(':');
+  if (type.toLowerCase() === "basic") {
+    const decoded = Buffer.from(encoded, "base64").toString("utf8");
+    const [username, password] = decoded.split(":");
 
     if (username === config.security.username && password === config.security.password) {
       return callback();
     }
   }
 
-  socket.write('HTTP/1.1 407 Proxy Authentication Required\r\n');
+  socket.write("HTTP/1.1 407 Proxy Authentication Required\r\n");
   socket.write('Proxy-Authenticate: Basic realm="Helsinki Crawler Proxy"\r\n');
-  socket.write('\r\n');
+  socket.write("\r\n");
   socket.end();
 });
 
@@ -100,7 +100,7 @@ proxy.onRequest((ctx, callback) => {
   const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers));
 
   const chunks: Buffer[] = [];
-      
+
   ctx.onResponseData((_ctx, chunk, callback) => {
     chunks.push(chunk);
     return callback(null, undefined);
@@ -108,13 +108,16 @@ proxy.onRequest((ctx, callback) => {
 
   ctx.onResponseEnd((ctx, callback) => {
     const responseHeaders = ctx.serverToProxyResponse?.headers;
-    const responseBody =  Buffer.concat(chunks);
+    const responseBody = Buffer.concat(chunks);
     const resnposeStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
     const responseContentType = responseHeaders?.["content-type"];
     const responseIsOk = resnposeStatusCode >= 200 && resnposeStatusCode <= 299;
     const responseIsHtml = responseContentType && responseContentType.includes("text/html");
 
-    log("debug", `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`);
+    log(
+      "debug",
+      `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
+    );
 
     if (responseIsOk && responseIsHtml) {
       const $ = cheerio.load(responseBody);
@@ -137,11 +140,10 @@ proxy.onRequest((ctx, callback) => {
 });
 
 proxy.listen({
-  host: '::',
+  host: "::",
   port: config.http.port,
   httpsPort: config.https.port,
   sslCaDir: config.ca.cacheDir,
-
 });
 
 console.log(`HTTP Proxy listening on port ${config.http.port}, HTTPS Proxy listening on port ${config.https.port}`);
