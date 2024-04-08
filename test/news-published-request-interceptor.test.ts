@@ -1,5 +1,6 @@
 import NewsPublishedRequestInterceptor from "../src/interceptors/news-published-request-interceptor";
 import ResourceUtils from "./utils/resource-utils";
+import { expect, test, describe } from "vitest";
 
 describe("News published request interceptor test suite", () => {
   test("Should intercept urls in hel.fi domain", async () => {
@@ -26,9 +27,9 @@ describe("News published request interceptor test suite", () => {
 
     const results = await Promise.all(
       testNewsUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="news_published"]').attr("content")).toBe("2024-03-20T11:45:36.000+02:00");
         expect($('head>meta[name="news_published"]').attr("class")).toBe("elastic");
       }),
@@ -43,9 +44,9 @@ describe("News published request interceptor test suite", () => {
 
     const results = await Promise.all(
       testServiceUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="news_published"]').length).toBe(0);
       }),
     );
@@ -59,9 +60,9 @@ describe("News published request interceptor test suite", () => {
 
     const results = await Promise.all(
       testUnitUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="news_published"]').length).toBe(0);
       }),
     );
@@ -75,9 +76,9 @@ describe("News published request interceptor test suite", () => {
 
     const results = await Promise.all(
       testLandingUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="news_published"]').length).toBe(0);
       }),
     );

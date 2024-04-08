@@ -2,6 +2,10 @@ import type { IncomingHttpHeaders } from "node:http";
 import type * as cheerio from "cheerio";
 import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 import { SUPPORTED_LANGUAGES } from "../constants";
+import type { DrupalSettingsJson } from "../types";
+import { franc } from "franc";
+import { iso6393To1 } from "iso-639-3";
+import HtmlUtils from "../utils/html-utils";
 
 export default class DocumentLanguageRequestInterceptor implements AbstractProxyRequestInterceptor {
   /**
@@ -19,18 +23,58 @@ export default class DocumentLanguageRequestInterceptor implements AbstractProxy
    * Intercept and modify the body of the response
    *
    * @param _headers request headers
-   * @param _requestUrl request url
+   * @param requestUrl request url
    * @param $ cheerio instance
    */
   public intercept = async (_headers: IncomingHttpHeaders, requestUrl: URL, $: cheerio.CheerioAPI) => {
-    const language = this.getLanguageFromUrl(requestUrl);
+    const language = this.resolveLanguage(requestUrl, $);
+    HtmlUtils.setMetaTag($, "language", language, "elastic");
   };
 
   /**
-   * Parse the language from the URL
+   * Resolves the language of the document. The language is resolved in the following order:
+   *
+   * 1. Drupal settings JSON
+   * 2. URL
+   * 3. Body content
+   * 4. html lang attribute
+   * 5. Default to "fi"
    *
    * @param requestUrl request url
-   * @returns language from the URL
+   * @param $ cheerio instance
+   * @returns language
+   */
+  private resolveLanguage = (requestUrl: URL, $: cheerio.CheerioAPI): string => {
+    const languageFromDrupalSettingsJson = this.detectLanguageFromDrupalSettingsJson($);
+    if (languageFromDrupalSettingsJson) {
+      return languageFromDrupalSettingsJson;
+    }
+
+    const languageFromUrl = this.getLanguageFromUrl(requestUrl);
+    if (languageFromUrl) {
+      return languageFromUrl;
+    }
+
+    const bodyContent = $("body").text();
+    const languageFromBodyContent = this.detectLanguageFromContents(bodyContent);
+    if (languageFromBodyContent) {
+      return languageFromBodyContent;
+    }
+
+    const lowerCaseBodyContent = bodyContent.toLowerCase();
+    if ("ipsum".indexOf(lowerCaseBodyContent) || "lorem".indexOf(lowerCaseBodyContent)) {
+      // lorem ipsum is interpret as "latin", this is necessary because there actually is lorem ipsum in target sites
+      return "la";
+    }
+
+    return $("html").attr("lang") || "fi";
+  };
+
+  /**
+   * Parse the language from the URL. The language can be in the first or second part (/fi/ or /something/fi/) of the URL.
+   *
+   * @param requestUrl request url
+   * @returns language from the URL or null if not detected
    */
   private getLanguageFromUrl = (requestUrl: URL): string | null => {
     const parts = requestUrl.pathname.split("/");
@@ -46,5 +90,38 @@ export default class DocumentLanguageRequestInterceptor implements AbstractProxy
     }
 
     return null;
+  };
+
+  /**
+   * Detects language from Drupal settings JSON. If the document contains Drupal settings JSON, the current language is extracted from it.
+   *
+   * @param $ cheerio instance
+   * @returns language or null if not detected
+   */
+  private detectLanguageFromDrupalSettingsJson = ($: cheerio.CheerioAPI) => {
+    const element = $("script[data-drupal-selector=drupal-settings-json]");
+    if (!element.length) return;
+
+    const jsonString = element.html();
+    if (!jsonString?.length) return;
+
+    const drupalSettingJson: DrupalSettingsJson = JSON.parse(jsonString);
+
+    return drupalSettingJson.path?.currentLanguage || null;
+  };
+
+  /**
+   * Detects language for given contents
+   *
+   * @param bodyContent contents
+   * @returns language or null if not detected
+   */
+  private detectLanguageFromContents = (bodyContent: string): string | null => {
+    const result = franc(bodyContent);
+    if (result === "und") {
+      return null;
+    }
+
+    return iso6393To1[result];
   };
 }
