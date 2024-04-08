@@ -72,10 +72,11 @@ mitmProxy.onConnect((req, socket, _head, callback) => {
  * Proxy request handler
  */
 mitmProxy.onRequest((ctx, callback) => {
+  const protocol = ctx.isSSL ? "https" : "http";
   const host = ctx.clientToProxyRequest.headers.host;
   const url = ctx.clientToProxyRequest.url;
 
-  const requestUrl = new URL(`${host}${url}`);
+  const requestUrl = new URL(`${protocol}://${host}${url}`);
 
   Logging.log("debug", `Request to: ${requestUrl}`);
 
