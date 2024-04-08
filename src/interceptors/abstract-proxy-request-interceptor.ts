@@ -9,14 +9,16 @@ export default interface AbstractProxyRequestInterceptor {
    * Returns true if the interceptor should intercept the request
    *
    * @param headers request headers
+   * @param requestUrl request url
    */
-  shouldIntercept(headers: IncomingHttpHeaders): boolean;
+  shouldIntercept(headers: IncomingHttpHeaders, requestUrl: URL): boolean;
 
   /**
    * Intercepts the target url. The interceptor should modifies directly the $ instance.
    *
    * @param headers request headers
    * @param $ cheerio instance
+   * @param requestUrl request url
    */
-  intercept(headers: IncomingHttpHeaders, $: cheerio.CheerioAPI): Promise<void>;
+  intercept(headers: IncomingHttpHeaders, requestUrl: URL, $: cheerio.CheerioAPI): Promise<void>;
 }

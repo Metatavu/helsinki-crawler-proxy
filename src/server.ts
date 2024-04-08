@@ -74,13 +74,14 @@ mitmProxy.onConnect((req, socket, _head, callback) => {
 mitmProxy.onRequest((ctx, callback) => {
   const host = ctx.clientToProxyRequest.headers.host;
   const url = ctx.clientToProxyRequest.url;
-  const requestUrl = `${host}${url}`;
+
+  const requestUrl = new URL(`${host}${url}`);
 
   Logging.log("debug", `Request to: ${requestUrl}`);
 
   const { clientToProxyRequest } = ctx;
   const { headers } = clientToProxyRequest;
-  const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers));
+  const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers, requestUrl));
 
   const chunks: Buffer[] = [];
 
@@ -106,7 +107,7 @@ mitmProxy.onRequest((ctx, callback) => {
       const $ = cheerio.load(responseBody);
 
       for (const interceptor of requestInterceptors) {
-        interceptor.intercept(headers, $);
+        interceptor.intercept(headers, requestUrl, $);
       }
 
       const bodyHtml = $.html();

@@ -29,9 +29,10 @@ export default class NewsPublishedRequestInterceptor implements AbstractProxyReq
    * Intercept and modify the body of the response
    *
    * @param _headers request headers
+   * @param _requestUrl request url
    * @param $ cheerio instance
    */
-  public intercept = async (_headers: IncomingHttpHeaders, $: cheerio.CheerioAPI) => {
+  public intercept = async (_headers: IncomingHttpHeaders, _requestUrl: URL, $: cheerio.CheerioAPI) => {
     const contentCategory = HtmlUtils.getMetaTag($, "helfi_content_type");
     if (contentCategory === "news_item") {
       const publishDate = this.getNewsPublished($);
