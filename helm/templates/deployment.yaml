@@ -40,6 +40,8 @@ spec:
             value: {{ .Values.credentials.password }}
           - name: LOGGING_LEVEL
             value: "debug"
+          - name: DISABLE_INTERCEPTORS
+            value: "true"
           - name: NODE_ENV
             value: "production"
         ports:

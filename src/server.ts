@@ -75,65 +75,69 @@ if (config.security.username && config.security.password) {
   });
 }
 
-/**
- * Proxy request handler
- */
-mitmProxy.onRequest((ctx, callback) => {
-  const protocol = ctx.isSSL ? "https" : "http";
-  const host = ctx.clientToProxyRequest.headers.host;
-  const url = ctx.clientToProxyRequest.url;
+if (!config.interceptors.disable) {
+  /**
+   * Proxy request handler
+   */
+  mitmProxy.onRequest((ctx, callback) => {
+    const protocol = ctx.isSSL ? "https" : "http";
+    const host = ctx.clientToProxyRequest.headers.host;
+    const url = ctx.clientToProxyRequest.url;
 
-  ctx.use(MitmProxy.gunzip);
+    ctx.use(MitmProxy.gunzip);
 
-  const requestUrl = new URL(`${protocol}://${host}${url}`);
+    const requestUrl = new URL(`${protocol}://${host}${url}`);
 
-  Logging.log("debug", `Request to: ${requestUrl}`);
+    Logging.log("debug", `Request to: ${requestUrl}`);
 
-  const { clientToProxyRequest } = ctx;
-  const { headers } = clientToProxyRequest;
-  const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers, requestUrl));
+    const { clientToProxyRequest } = ctx;
+    const { headers } = clientToProxyRequest;
+    const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers, requestUrl));
 
-  const chunks: Buffer[] = [];
+    const chunks: Buffer[] = [];
 
-  ctx.onResponseData((_ctx, chunk, callback) => {
-    chunks.push(chunk);
-    return callback(null, undefined);
-  });
+    ctx.onResponseData((_ctx, chunk, callback) => {
+      chunks.push(chunk);
+      return callback(null, undefined);
+    });
 
-  ctx.onResponseEnd((ctx, callback) => {
-    const responseHeaders = ctx.serverToProxyResponse?.headers;
-    const responseBody = Buffer.concat(chunks);
-    const resnposeStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
-    const responseContentType = responseHeaders?.["content-type"];
-    const responseIsOk = resnposeStatusCode >= 200 && resnposeStatusCode <= 299;
-    const responseIsHtml = responseContentType?.includes("text/html");
+    ctx.onResponseEnd((ctx, callback) => {
+      const responseHeaders = ctx.serverToProxyResponse?.headers;
+      const responseBody = Buffer.concat(chunks);
+      const resnposeStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
+      const responseContentType = responseHeaders?.["content-type"];
+      const responseIsOk = resnposeStatusCode >= 200 && resnposeStatusCode <= 299;
+      const responseIsHtml = responseContentType?.includes("text/html");
 
-    Logging.log(
-      "debug",
-      `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
-    );
+      Logging.log(
+        "debug",
+        `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
+      );
 
-    ctx.proxyToClientResponse.statusCode = resnposeStatusCode;
+      ctx.proxyToClientResponse.statusCode = resnposeStatusCode;
 
-    if (responseIsOk && responseIsHtml) {
-      const $ = cheerio.load(responseBody);
+      if (responseIsOk && responseIsHtml) {
+        const $ = cheerio.load(responseBody);
 
-      for (const interceptor of requestInterceptors) {
-        interceptor.intercept(headers, requestUrl, $);
+        for (const interceptor of requestInterceptors) {
+          interceptor.intercept(headers, requestUrl, $);
+        }
+
+        const bodyHtml = $.html();
+
+        ctx.proxyToClientResponse.write(bodyHtml);
+      } else {
+        ctx.proxyToClientResponse.write(responseBody);
       }
 
-      const bodyHtml = $.html();
+      return callback();
+    });
 
-      ctx.proxyToClientResponse.write(bodyHtml);
-    } else {
-      ctx.proxyToClientResponse.write(responseBody);
-    }
-
-    return callback();
+    callback();
   });
-
-  callback();
-});
+} else {
+  Logging.log("info", "Interceptors disabled");
+}
 
 mitmProxy.listen({
   host: "::",

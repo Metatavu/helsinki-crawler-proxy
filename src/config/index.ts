@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { cleanEnv, num, str } from "envalid";
+import { bool, cleanEnv, num, str } from "envalid";
 
 dotenv.config();
 
@@ -13,9 +13,13 @@ const env = cleanEnv(process.env, {
   CA_PUBLIC_KEY: str({ devDefault: "/tmp/ca/public.pem" }),
   USERNAME: str({ default: undefined }),
   PASSWORD: str({ default: undefined }),
+  DISABLE_INTERCEPTORS: bool({ default: false }),
 });
 
 export default {
+  interceptors: {
+    disable: env.DISABLE_INTERCEPTORS,
+  },
   logging: {
     level: env.LOGGING_LEVEL,
   },
