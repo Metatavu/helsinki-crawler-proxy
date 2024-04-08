@@ -32,7 +32,7 @@ spec:
             value: /etc/pki/ca/ca.private.key
           - name: CA_PUBLIC_KEY
             value: /etc/pki/ca/ca.public.key
-          - name: CA_CACHE_DIR
+          - name: CA_CACHE_DIR_DISABLED
             value: /tmp/cacache
           - name: USERNAME
             value: {{ .Values.credentials.username }}
