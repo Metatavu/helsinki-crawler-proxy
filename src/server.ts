@@ -113,6 +113,8 @@ mitmProxy.onRequest((ctx, callback) => {
       `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
     );
 
+    ctx.proxyToClientResponse.statusCode = resnposeStatusCode;
+
     if (responseIsOk && responseIsHtml) {
       const $ = cheerio.load(responseBody);
 
