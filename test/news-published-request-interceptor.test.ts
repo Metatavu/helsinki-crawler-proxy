@@ -1,9 +1,9 @@
-import DocumentCategoryRequestInterceptor from "../src/interceptors/document-category-request-interceptor";
+import NewsPublishedRequestInterceptor from "../src/interceptors/news-published-request-interceptor";
 import ResourceUtils from "./utils/resource-utils";
 
-describe("Document category request interceptor test suite", () => {
+describe("News published request interceptor test suite", () => {
   test("Should intercept urls in hel.fi domain", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
+    const interceptor = new NewsPublishedRequestInterceptor();
 
     for (const url of ResourceUtils.getTestHelFiUrls()) {
       const headers = ResourceUtils.getRequestHeadersForUrl(url);
@@ -12,7 +12,7 @@ describe("Document category request interceptor test suite", () => {
   });
 
   test("Should not intercept urls outside hel.fi domain", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
+    const interceptor = new NewsPublishedRequestInterceptor();
 
     for (const url of ResourceUtils.getOtherTestUrls()) {
       const headers = ResourceUtils.getRequestHeadersForUrl(url);
@@ -20,8 +20,8 @@ describe("Document category request interceptor test suite", () => {
     }
   });
 
-  test("Should add news category meta tag to pages news pages", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
+  test("Should add news publish date meta tag to pages news pages", async () => {
+    const interceptor = new NewsPublishedRequestInterceptor();
     const testNewsUrls = ResourceUtils.getTestHelFiNewsArticleUrls();
 
     const results = await Promise.all(
@@ -29,16 +29,16 @@ describe("Document category request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="category"]').attr("content")).toBe("news");
-        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
+        expect($('head>meta[name="news_published"]').attr("content")).toBe("2024-03-20T11:45:36.000+02:00");
+        expect($('head>meta[name="news_published"]').attr("class")).toBe("elastic");
       }),
     );
 
     expect(results.length).toBe(testNewsUrls.length);
   });
 
-  test("Should add service category meta tag to service pages", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
+  test("Should not add publish date meta tag to service pages", async () => {
+    const interceptor = new NewsPublishedRequestInterceptor();
     const testServiceUrls = ResourceUtils.getTestHelFiServiceUrls();
 
     const results = await Promise.all(
@@ -46,16 +46,15 @@ describe("Document category request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="category"]').attr("content")).toBe("service");
-        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
+        expect($('head>meta[name="news_published"]').length).toBe(0);
       }),
     );
 
     expect(results.length).toBe(testServiceUrls.length);
   });
 
-  test("Should add unit category meta tag to unit pages", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
+  test("Should not add publish meta tag to unit pages", async () => {
+    const interceptor = new NewsPublishedRequestInterceptor();
     const testUnitUrls = ResourceUtils.getTestHelFiUnitUrls();
 
     const results = await Promise.all(
@@ -63,16 +62,15 @@ describe("Document category request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="category"]').attr("content")).toBe("unit");
-        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
+        expect($('head>meta[name="news_published"]').length).toBe(0);
       }),
     );
 
     expect(results.length).toBe(testUnitUrls.length);
   });
 
-  test("Should add uncategorized category meta tag to unit pages", async () => {
-    const interceptor = new DocumentCategoryRequestInterceptor();
+  test("Should not add publish meta tag to landing pages", async () => {
+    const interceptor = new NewsPublishedRequestInterceptor();
     const testLandingUrls = ResourceUtils.getTestHelFiLandingPageUrls();
 
     const results = await Promise.all(
@@ -80,8 +78,7 @@ describe("Document category request interceptor test suite", () => {
         const { $ } = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
         await interceptor.intercept(headers, $);
-        expect($('head>meta[name="category"]').attr("content")).toBe("uncategorized");
-        expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
+        expect($('head>meta[name="news_published"]').length).toBe(0);
       }),
     );
 

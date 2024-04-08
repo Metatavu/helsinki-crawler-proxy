@@ -4,6 +4,11 @@ import { ContentCategory } from "../elastic/types";
 import HtmlUtils from "../utils/html-utils";
 import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 
+/**
+ * Document category request interceptor.
+ *
+ * This interceptor is responsible for setting the content category for all documents in www.hel.fi.
+ */
 export default class DocumentCategoryRequestInterceptor implements AbstractProxyRequestInterceptor {
   /**
    * Document category request interceptor should intercept all www.hel.fi requests but not other domains
