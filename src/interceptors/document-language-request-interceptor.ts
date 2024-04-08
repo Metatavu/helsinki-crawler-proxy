@@ -1,11 +1,11 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type * as cheerio from "cheerio";
-import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
-import { SUPPORTED_LANGUAGES } from "../constants";
-import type { DrupalSettingsJson } from "../types";
 import { franc } from "franc";
 import { iso6393To1 } from "iso-639-3";
+import { SUPPORTED_LANGUAGES } from "../constants";
+import type { DrupalSettingsJson } from "../types";
 import HtmlUtils from "../utils/html-utils";
+import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 
 export default class DocumentLanguageRequestInterceptor implements AbstractProxyRequestInterceptor {
   /**

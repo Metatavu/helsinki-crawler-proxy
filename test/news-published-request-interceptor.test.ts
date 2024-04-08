@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
+import { describe, expect, test } from "vitest";
 import NewsPublishedRequestInterceptor from "../src/interceptors/news-published-request-interceptor";
 import ResourceUtils from "./utils/resource-utils";
-import { expect, test, describe } from "vitest";
 
 describe("News published request interceptor test suite", () => {
   test("Should intercept urls in hel.fi domain", async () => {

@@ -1,6 +1,6 @@
+import { describe, expect, test } from "vitest";
 import DocumentCategoryRequestInterceptor from "../src/interceptors/document-category-request-interceptor";
 import ResourceUtils from "./utils/resource-utils";
-import { expect, test, describe } from "vitest";
 
 describe("Document category request interceptor test suite", () => {
   test("Should intercept urls in hel.fi domain", async () => {
