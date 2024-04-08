@@ -1,0 +1,10 @@
+apiVersion: v2
+name: helsinki-crawler-proxy
+description: |
+  A Helm chart for the Helsinki Crawler Proxy
+type: application
+version: 1.0.0
+keywords:
+  - helsinki
+  - crawler
+  - proxy

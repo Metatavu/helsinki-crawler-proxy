@@ -1,0 +1,20 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/metatavu/helsinki-crawler-proxy
+  pullPolicy: Always
+  sha256: __CHANGE_ME__
+
+livenessProbe:
+  failureTreshold: 3
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 3
+
+readinessProbe:
+  failureTreshold: 3
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 3
