@@ -83,6 +83,8 @@ mitmProxy.onRequest((ctx, callback) => {
   const host = ctx.clientToProxyRequest.headers.host;
   const url = ctx.clientToProxyRequest.url;
 
+  ctx.use(MitmProxy.gunzip);
+
   const requestUrl = new URL(`${protocol}://${host}${url}`);
 
   Logging.log("debug", `Request to: ${requestUrl}`);
