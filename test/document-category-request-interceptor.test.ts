@@ -1,3 +1,4 @@
+import { describe, expect, test } from "vitest";
 import DocumentCategoryRequestInterceptor from "../src/interceptors/document-category-request-interceptor";
 import ResourceUtils from "./utils/resource-utils";
 
@@ -7,7 +8,7 @@ describe("Document category request interceptor test suite", () => {
 
     for (const url of ResourceUtils.getTestHelFiUrls()) {
       const headers = ResourceUtils.getRequestHeadersForUrl(url);
-      expect(interceptor.shouldIntercept(headers)).toBe(true);
+      expect(interceptor.shouldIntercept(headers, url)).toBe(true);
     }
   });
 
@@ -16,7 +17,7 @@ describe("Document category request interceptor test suite", () => {
 
     for (const url of ResourceUtils.getOtherTestUrls()) {
       const headers = ResourceUtils.getRequestHeadersForUrl(url);
-      expect(interceptor.shouldIntercept(headers)).toBe(false);
+      expect(interceptor.shouldIntercept(headers, url)).toBe(false);
     }
   });
 
@@ -26,9 +27,9 @@ describe("Document category request interceptor test suite", () => {
 
     const results = await Promise.all(
       testNewsUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="category"]').attr("content")).toBe("news");
         expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
@@ -43,9 +44,9 @@ describe("Document category request interceptor test suite", () => {
 
     const results = await Promise.all(
       testServiceUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="category"]').attr("content")).toBe("service");
         expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
@@ -60,9 +61,9 @@ describe("Document category request interceptor test suite", () => {
 
     const results = await Promise.all(
       testUnitUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="category"]').attr("content")).toBe("unit");
         expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),
@@ -77,9 +78,9 @@ describe("Document category request interceptor test suite", () => {
 
     const results = await Promise.all(
       testLandingUrls.map(async (url) => {
-        const { $ } = ResourceUtils.getTestResourceForUrl(url);
+        const $ = ResourceUtils.getTestResourceForUrl(url);
         const headers = ResourceUtils.getRequestHeadersForUrl(url);
-        await interceptor.intercept(headers, $);
+        await interceptor.intercept(headers, url, $);
         expect($('head>meta[name="category"]').attr("content")).toBe("uncategorized");
         expect($('head>meta[name="category"]').attr("class")).toBe("elastic");
       }),

@@ -1,6 +1,6 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type * as cheerio from "cheerio";
-import { ContentCategory } from "../elastic/types";
+import { ContentCategory } from "../constants";
 import HtmlUtils from "../utils/html-utils";
 import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 
@@ -14,9 +14,10 @@ export default class DocumentCategoryRequestInterceptor implements AbstractProxy
    * Document category request interceptor should intercept all www.hel.fi requests but not other domains
    *
    * @param headers request headers
+   * @param _requestUrl request url
    * @returns whether the interceptor should intercept the request
    */
-  public shouldIntercept = (headers: IncomingHttpHeaders): boolean => {
+  public shouldIntercept = (headers: IncomingHttpHeaders, _requestUrl: URL): boolean => {
     try {
       return headers.host === "www.hel.fi";
     } catch (error) {
@@ -28,9 +29,10 @@ export default class DocumentCategoryRequestInterceptor implements AbstractProxy
    * Intercept and modify the body of the response
    *
    * @param _headers request headers
+   * @param _requestUrl request url
    * @param $ cheerio instance
    */
-  public intercept = async (_headers: IncomingHttpHeaders, $: cheerio.CheerioAPI) => {
+  public intercept = async (_headers: IncomingHttpHeaders, _requestUrl: URL, $: cheerio.CheerioAPI) => {
     const helfiContentType = HtmlUtils.getMetaTag($, "helfi_content_type");
     const contentCategory = this.getContentCategory(helfiContentType);
 

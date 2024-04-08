@@ -6,7 +6,6 @@ import * as cheerio from "cheerio";
  * Test resource interface
  */
 export interface TestResource {
-  url: string;
   $: cheerio.CheerioAPI;
 }
 
@@ -17,12 +16,8 @@ namespace ResourceUtils {
    * @param url url
    * @returns test resource for given url
    */
-  export const getTestResourceForUrl = (url: string): TestResource => {
-    return {
-      url: url,
-      $: loadParsedHtmlResource(`${url.replace("https://", "")}.html`),
-    };
-  };
+  export const getTestResourceForUrl = (url: URL): cheerio.CheerioAPI =>
+    loadParsedHtmlResource(`${url.toString().replace("https://", "").replace(/\/$/, "")}.html`);
 
   /**
    * Loads html resource as string
@@ -50,9 +45,9 @@ namespace ResourceUtils {
    * @param url url
    * @returns request headers for given url
    */
-  export const getRequestHeadersForUrl = (url: string) => {
+  export const getRequestHeadersForUrl = (url: URL) => {
     return {
-      host: new URL(url).host,
+      host: url.host,
     };
   };
 
@@ -62,7 +57,9 @@ namespace ResourceUtils {
    * @returns list of urls from hel.fi domain with content type tpr_unit
    */
   export const getTestHelFiUnitUrls = () => [
-    "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/perheneuvola/perheneuvola-ruotsinkielinen-palvelu",
+    new URL(
+      "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/perheneuvola/perheneuvola-ruotsinkielinen-palvelu",
+    ),
   ];
 
   /**
@@ -71,7 +68,9 @@ namespace ResourceUtils {
    * @returns list of urls from hel.fi domain with content type tpr_service
    */
   export const getTestHelFiServiceUrls = () => [
-    "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/lapsiperheiden-sosiaalineuvonta",
+    new URL(
+      "https://www.hel.fi/fi/sosiaali-ja-terveyspalvelut/lasten-ja-perheiden-palvelut/tukea-lapselle-nuorelle-ja-perheelle/vanhemmuuden-ja-perhearjen-tuki/lapsiperheiden-sosiaalineuvonta",
+    ),
   ];
 
   /**
@@ -80,7 +79,23 @@ namespace ResourceUtils {
    * @returns list of urls from hel.fi domain with content type news_item
    */
   export const getTestHelFiNewsArticleUrls = () => [
-    "https://www.hel.fi/fi/uutiset/kaupunkipyorakausi-alkaa-huhtikuun-alussa-0",
+    new URL("https://www.hel.fi/fi/uutiset/kaupunkipyorakausi-alkaa-huhtikuun-alussa-0"),
+  ];
+
+  /**
+   * Returns list of urls from hel.fi domain with content type landing page in finnish
+   *
+   * @returns list of urls from hel.fi domain with content type landing page
+   */
+  export const getTestHelFiLandingPageUrlsFi = () => [new URL("https://www.hel.fi/fi/asuminen/vuokra-asunnot")];
+
+  /**
+   * Returns list of urls from hel.fi domain with content type landing page in swedish
+   *
+   * @returns list of urls from hel.fi domain with content type landing page
+   */
+  export const getTestHelFiLandingPageUrlsSv = () => [
+    new URL("https://www.hel.fi/sv/social-och-halsovardstjanster/funktionshinderservice/boende"),
   ];
 
   /**
@@ -88,7 +103,10 @@ namespace ResourceUtils {
    *
    * @returns list of urls from hel.fi domain with content type landing page
    */
-  export const getTestHelFiLandingPageUrls = () => ["https://www.hel.fi/fi/asuminen/vuokra-asunnot"];
+  export const getTestHelFiLandingPageUrls = () => [
+    ...getTestHelFiLandingPageUrlsFi(),
+    ...getTestHelFiLandingPageUrlsSv(),
+  ];
 
   /**
    * Returns list of urls from hel.fi domain
@@ -105,14 +123,30 @@ namespace ResourceUtils {
   };
 
   /**
+   * Returns list of domains outside hel.fi domain in finnish
+   *
+   * @returns list of domains outside hel.fi domain
+   */
+  export const getOtherTestUrlsFi = () => [
+    new URL("https://helsinkipaiva.fi/info"),
+    new URL("https://nuorten.hel.fi/nuorisotalot/arabian-nuorisotalo"),
+  ];
+
+  /**
+   * Returns list of domains outside hel.fi domain in swedish
+   *
+   * @returns list of domains outside hel.fi domain
+   */
+  export const getOtherTestUrlsSv = () => [new URL("https://helsinkipaiva.fi/sv/info-3")];
+
+  /**
    * Returns list of domains outside hel.fi domain
    *
    * @returns list of domains outside hel.fi domain
    */
-  export const getOtherTestUrls = () => [
-    "https://helsinkipaiva.fi/info/",
-    "https://nuorten.hel.fi/nuorisotalot/arabian-nuorisotalo/",
-  ];
+  export const getOtherTestUrls = () => {
+    return [...getOtherTestUrlsFi(), ...getOtherTestUrlsSv()];
+  };
 
   /**
    * Returns list of malformed urls
