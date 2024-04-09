@@ -1,17 +1,18 @@
-name: Publish to staging
+name: Publish to master
 
 on:
   push:
     branches:
       - develop
       - feature-13-ports
+
 env:
   REGISTRY: ghcr.io
   GITHUB_REPOSITORY: ${{ github.repository }}
 
 jobs:
   build-and-push-image:
-    environment: develop
+    environment: master
     runs-on: ubuntu-latest    
     permissions:
       contents: read
