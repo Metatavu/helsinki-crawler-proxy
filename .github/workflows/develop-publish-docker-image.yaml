@@ -73,5 +73,5 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: 'Update deployment'
-        run: 'gcloud compute ssh ${{ secrets.GCLOUD_USER }}@helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "/home/anttileppa/update/update.sh ${{ github.ref_name }} staging ${{ steps.dockerpush.outputs.digest }}"'
+        run: 'gcloud compute ssh ${{ secrets.GCLOUD_USER }}@helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "/home/${{ GCLOUD_USER }}/update/update.sh ${{ github.ref_name }} staging ${{ steps.dockerpush.outputs.digest }}"'
         
