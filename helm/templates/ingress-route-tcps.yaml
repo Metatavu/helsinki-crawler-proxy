@@ -5,12 +5,12 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
-    - proxy
+    - {{ .Values.service.http.entrypoint }}
   routes:
     - match: HostSNI(`*`)
       services:
         - name: {{ .Release.Name }}-helsinki-crawler-proxy
-          port: 3000
+          port: {{ .Values.service.http.port }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRouteTCP
@@ -19,9 +19,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   entryPoints:
-    - proxysecure
+    - {{ .Values.service.https.entrypoint }}
   routes:
     - match: HostSNI(`*`)
       services:
         - name: {{ .Release.Name }}-helsinki-crawler-proxy
-          port: 3443
+          port: {{ .Values.service.https.port }}
