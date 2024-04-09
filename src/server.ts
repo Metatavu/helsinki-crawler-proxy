@@ -44,6 +44,11 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
     return;
   }
 
+  if (errorKind === "PROXY_TO_PROXY_SOCKET_ERROR") {
+    // PROXY_TO_PROXY_SOCKET_ERROR is a common connection error that can be ignored
+    return;
+  }
+
   const host = ctx?.clientToProxyRequest.headers.host;
   const url = ctx?.clientToProxyRequest.url;
   const requestUrl = host && url ? `${host}${url}` : "unknown";
@@ -57,11 +62,6 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
     message.push(`  ctx.serverToProxyResponse: ${JSON.stringify(ctx.serverToProxyResponse)}`);
   } else {
     message.push("  ctx: null");
-  }
-
-  for (const connectRequestKey in mitmProxy.connectRequests) {
-    const connectRequest = mitmProxy.connectRequests[connectRequestKey];
-    message.push(`  connect request: (${connectRequestKey}) ${JSON.stringify(connectRequest)}`);
   }
 
   Logging.log("error", message.join("\n"));
