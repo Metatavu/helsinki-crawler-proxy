@@ -122,7 +122,7 @@ if (!config.interceptors.disable) {
 
       Logging.log(
         "debug",
-        `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
+        `Response from: ${requestUrl}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
       );
 
       if (responseIsOk && responseIsHtml) {
@@ -140,6 +140,10 @@ if (!config.interceptors.disable) {
       }
 
       return callback();
+    });
+
+    ctx.onError((_ctx, err) => {
+      Logging.log("error", `Error: ${err} for ${requestUrl}`);
     });
 
     callback();

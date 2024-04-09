@@ -34,9 +34,9 @@ spec:
             value: /etc/pki/ca/ca.public.key
           - name: CA_CACHE_DIR_DISABLED
             value: /tmp/cacache
-          - name: USERNAME_DISABLED
+          - name: USERNAME
             value: {{ .Values.credentials.username }}
-          - name: PASSWORD_DISABLED
+          - name: PASSWORD
             value: {{ .Values.credentials.password }}
           - name: LOGGING_LEVEL
             value: "debug"
