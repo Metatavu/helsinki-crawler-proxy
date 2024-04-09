@@ -21,6 +21,11 @@ namespace Logging {
       console.log(`[${level}] ${message}`);
     }
   };
+
+  /**
+   * The log level
+   */
+  export const level = config.logging.level;
 }
 
 export default Logging;

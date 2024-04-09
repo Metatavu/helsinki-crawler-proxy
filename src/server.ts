@@ -48,7 +48,18 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
   const url = ctx?.clientToProxyRequest.url;
   const requestUrl = host && url ? `${host}${url}` : "unknown";
 
-  Logging.log("error", `proxy error: ${err} (${errorKind}) for ${requestUrl}`);
+  const message = [`proxy error: ${err} (${errorKind}) for ${requestUrl}`];
+
+  if (ctx) {
+    message.push(`  ctx.clientToProxyRequest: ${JSON.stringify(ctx.clientToProxyRequest)}`);
+    message.push(`  ctx.proxyToClientResponse: ${JSON.stringify(ctx.proxyToClientResponse)}`);
+    message.push(`  ctx.proxyToServerRequest: ${JSON.stringify(ctx.proxyToServerRequest)}`);
+    message.push(`  ctx.serverToProxyResponse: ${JSON.stringify(ctx.serverToProxyResponse)}`);
+  } else {
+    message.push("  ctx: null");
+  }
+
+  Logging.log("error", message.join("\n"));
 });
 
 if (config.security.username && config.security.password) {
@@ -113,8 +124,6 @@ if (!config.interceptors.disable) {
         "debug",
         `Response from: ${host}${url}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
       );
-
-      ctx.proxyToClientResponse.statusCode = resnposeStatusCode;
 
       if (responseIsOk && responseIsHtml) {
         const $ = cheerio.load(responseBody);
