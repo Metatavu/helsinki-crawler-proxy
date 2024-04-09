@@ -1,12 +1,10 @@
 import type { IncomingHttpHeaders } from "node:http";
 import type * as cheerio from "cheerio";
-import { franc } from "franc";
-import { iso6393To1 } from "iso-639-3";
+import { detectAll as detectLanguages } from "tinyld";
 import { SUPPORTED_LANGUAGES } from "../constants";
 import type { DrupalSettingsJson } from "../types";
 import HtmlUtils from "../utils/html-utils";
 import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
-
 export default class DocumentLanguageRequestInterceptor implements AbstractProxyRequestInterceptor {
   /**
    * Document language request interceptor should intercept all requests
@@ -117,11 +115,12 @@ export default class DocumentLanguageRequestInterceptor implements AbstractProxy
    * @returns language or null if not detected
    */
   private detectLanguageFromContents = (bodyContent: string): string | null => {
-    const result = franc(bodyContent);
-    if (result === "und") {
-      return null;
-    }
+    const result = detectLanguages(bodyContent, {
+      only: SUPPORTED_LANGUAGES,
+    }).filter((lang) => lang.accuracy > 0.8);
 
-    return iso6393To1[result];
+    if (!result.length) return null;
+
+    return result[0].lang || null;
   };
 }
