@@ -59,6 +59,11 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
     message.push("  ctx: null");
   }
 
+  for (const connectRequestKey in mitmProxy.connectRequests) {
+    const connectRequest = mitmProxy.connectRequests[connectRequestKey];
+    message.push(`  connect request: (${connectRequestKey}) ${JSON.stringify(connectRequest)}`);
+  }
+
   Logging.log("error", message.join("\n"));
 });
 
@@ -153,7 +158,7 @@ if (!config.interceptors.disable) {
 }
 
 mitmProxy.listen({
-  host: "0.0.0.0",
+  host: "::",
   port: config.http.port,
   httpsPort: config.https.port,
   sslCaDir: config.ca.cacheDir,
