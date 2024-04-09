@@ -31,7 +31,7 @@ export default class BreadcrumbsRequestInterceptor implements AbstractProxyReque
   public intercept = async (_headers: IncomingHttpHeaders, _requestUrl: URL, $: cheerio.CheerioAPI) => {
     const breadcrumbs = this.detectBreadcrumbs($);
     for (const breadcrumb of breadcrumbs) {
-      $("<meta>").attr("name", "breadcrumbs").attr("content", breadcrumb).appendTo("head");
+      $("<meta>").attr("name", "breadcrumbs").attr("content", breadcrumb).addClass("elastic").appendTo("head");
     }
   };
 

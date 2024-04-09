@@ -34,6 +34,7 @@ describe("Breadcrumbs request interceptor test suite", () => {
     expect(breadcrumbs.length).toBe(expectedBreadcrumbs.length);
     breadcrumbs.each((index, element) => {
       expect($(element).attr("content")).toBe(expectedBreadcrumbs[index]);
+      expect($(element).attr("class")).toBe("elastic");
     });
   });
 
@@ -57,6 +58,7 @@ describe("Breadcrumbs request interceptor test suite", () => {
     expect(breadcrumbs.length).toBe(expectedBreadcrumbs.length);
     breadcrumbs.each((index, element) => {
       expect($(element).attr("content")).toBe(expectedBreadcrumbs[index]);
+      expect($(element).attr("class")).toBe("elastic");
     });
   });
 
@@ -81,6 +83,7 @@ describe("Breadcrumbs request interceptor test suite", () => {
     expect(breadcrumbs.length).toBe(expectedBreadcrumbs.length);
     breadcrumbs.each((index, element) => {
       expect($(element).attr("content")).toBe(expectedBreadcrumbs[index]);
+      expect($(element).attr("class")).toBe("elastic");
     });
   });
 
