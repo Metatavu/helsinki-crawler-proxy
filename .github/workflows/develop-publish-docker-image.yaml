@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+
 env:
   REGISTRY: ghcr.io
   GITHUB_REPOSITORY: ${{ github.repository }}
