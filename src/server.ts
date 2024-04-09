@@ -36,6 +36,32 @@ const loadCaCertificate = () => {
 loadCaCertificate();
 const mitmProxy = new MitmProxy();
 
+/**
+ * Proxy error handler
+ */
+mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) => {
+  if (!err) {
+    return;
+  }
+
+  const host = ctx?.clientToProxyRequest.headers.host;
+  const url = ctx?.clientToProxyRequest.url;
+  const requestUrl = host && url ? `${host}${url}` : "unknown";
+
+  const message = [`proxy error: ${err} (${errorKind}) for ${requestUrl}`];
+
+  if (ctx) {
+    message.push(`  ctx.clientToProxyRequest: ${JSON.stringify(ctx.clientToProxyRequest)}`);
+    message.push(`  ctx.proxyToClientResponse: ${JSON.stringify(ctx.proxyToClientResponse)}`);
+    message.push(`  ctx.proxyToServerRequest: ${JSON.stringify(ctx.proxyToServerRequest)}`);
+    message.push(`  ctx.serverToProxyResponse: ${JSON.stringify(ctx.serverToProxyResponse)}`);
+  } else {
+    message.push("  ctx: null");
+  }
+
+  Logging.log("error", message.join("\n"));
+});
+
 if (config.security.username && config.security.password) {
   /**
    * Proxy connect handler. Method is used to authenticate the user
@@ -127,7 +153,7 @@ if (!config.interceptors.disable) {
 }
 
 mitmProxy.listen({
-  host: "::",
+  host: "0.0.0.0",
   port: config.http.port,
   httpsPort: config.https.port,
   sslCaDir: config.ca.cacheDir,
