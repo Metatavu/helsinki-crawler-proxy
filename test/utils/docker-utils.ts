@@ -20,8 +20,6 @@ namespace DockerUtils {
   }): Promise<string> => {
     const params = ["-x", options.proxyUrl.toString(), "-sS", "--insecure", options.url.toString()];
 
-    await docker.pull("quay.io/curl/curl:8.7.1");
-
     return new Promise((resolve, reject) => {
       docker
         .createContainer({
