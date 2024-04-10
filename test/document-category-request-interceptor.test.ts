@@ -72,7 +72,7 @@ describe("Document category request interceptor test suite", () => {
     expect(results.length).toBe(testUnitUrls.length);
   });
 
-  test("Should add uncategorized category meta tag to unit pages", async () => {
+  test("Should add uncategorized category meta tag to landing pages", async () => {
     const interceptor = new DocumentCategoryRequestInterceptor();
     const testLandingUrls = ResourceUtils.getTestHelFiLandingPageUrls();
 

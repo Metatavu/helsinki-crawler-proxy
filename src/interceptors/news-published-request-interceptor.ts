@@ -1,4 +1,5 @@
 import type { IncomingHttpHeaders } from "node:http";
+import { env } from "node:process";
 import type * as cheerio from "cheerio";
 import { DateTime } from "luxon";
 import Logging from "../logging";
@@ -15,9 +16,14 @@ export default class NewsPublishedRequestInterceptor implements AbstractProxyReq
    * News published request interceptor should intercept all www.hel.fi requests but not other domains
    *
    * @param headers request headers
+   * @param requestUrl request url
    * @returns whether the interceptor should intercept the request
    */
-  public shouldIntercept = (headers: IncomingHttpHeaders): boolean => {
+  public shouldIntercept = (headers: IncomingHttpHeaders, requestUrl: URL): boolean => {
+    if (env.NODE_ENV === "e2e") {
+      return requestUrl.pathname.startsWith("www.hel.fi");
+    }
+
     try {
       return headers.host === "www.hel.fi";
     } catch (error) {

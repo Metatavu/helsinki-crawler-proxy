@@ -17,7 +17,15 @@ namespace ResourceUtils {
    * @returns test resource for given url
    */
   export const getTestResourceForUrl = (url: URL): cheerio.CheerioAPI =>
-    loadParsedHtmlResource(`${url.toString().replace("https://", "").replace(/\/$/, "")}.html`);
+    loadParsedHtmlResource(getResourcePathForUrl(url));
+
+  /**
+   * Load html for given url
+   *
+   * @param url url
+   * @returns html for given url
+   */
+  export const loadHtmlForUrl = (url: URL): string => loadHtmlResource(getResourcePathForUrl(url));
 
   /**
    * Loads html resource as string
@@ -175,6 +183,15 @@ namespace ResourceUtils {
     "http://",
     "",
   ];
+
+  /**
+   * Get resource path for given url
+   *
+   * @param url url
+   * @returns resource path for given url
+   */
+  const getResourcePathForUrl = (url: URL): string =>
+    `${url.toString().replace("https://", "").replace(/\/$/, "")}.html`;
 }
 
 export default ResourceUtils;

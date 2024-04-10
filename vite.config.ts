@@ -3,5 +3,8 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  test: {},
+  test: {
+    hookTimeout: 60000,
+    testTimeout: 60000,
+  },
 });
