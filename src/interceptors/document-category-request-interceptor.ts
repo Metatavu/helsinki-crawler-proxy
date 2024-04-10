@@ -1,4 +1,5 @@
 import type { IncomingHttpHeaders } from "node:http";
+import { env } from "node:process";
 import type * as cheerio from "cheerio";
 import { ContentCategory } from "../constants";
 import HtmlUtils from "../utils/html-utils";
@@ -14,10 +15,14 @@ export default class DocumentCategoryRequestInterceptor implements AbstractProxy
    * Document category request interceptor should intercept all www.hel.fi requests but not other domains
    *
    * @param headers request headers
-   * @param _requestUrl request url
+   * @param requestUrl request url
    * @returns whether the interceptor should intercept the request
    */
-  public shouldIntercept = (headers: IncomingHttpHeaders, _requestUrl: URL): boolean => {
+  public shouldIntercept = (headers: IncomingHttpHeaders, requestUrl: URL): boolean => {
+    if (env.NODE_ENV === "e2e") {
+      return requestUrl.pathname.startsWith("/www.hel.fi");
+    }
+
     try {
       return headers.host === "www.hel.fi";
     } catch (error) {
