@@ -12,7 +12,7 @@ namespace DockerUtils {
    * @param options options
    * @returns The output of the curl command
    */
-  export const runCurl = (options: {
+  export const runCurl = async (options: {
     insecure: boolean;
     proxyUrl: URL;
     url: URL;
@@ -20,10 +20,12 @@ namespace DockerUtils {
   }): Promise<string> => {
     const params = ["-x", options.proxyUrl.toString(), "-sS", "--insecure", options.url.toString()];
 
+    await docker.pull("quay.io/curl/curl:8.7.1");
+
     return new Promise((resolve, reject) => {
       docker
         .createContainer({
-          Image: "quay.io/curl/curl:latest",
+          Image: "quay.io/curl/curl:8.7.1",
           Cmd: ["sh", "-c", `curl ${params.join(" ")} > /tmp/output`],
           AttachStdout: true,
           AttachStderr: true,
