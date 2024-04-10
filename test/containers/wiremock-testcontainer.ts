@@ -1,7 +1,6 @@
 import { GenericContainer, type StartedNetwork, type StartedTestContainer, type TestContainer } from "testcontainers";
-import { BodyType, WireMock, type IWireMockFeatures } from "wiremock-captain";
+∂import { BodyType, WireMock } from "wiremock-captain";
 import ResourceUtils from "../utils/resource-utils";
-import { HttpWaitStrategy } from "testcontainers/build/wait-strategies/http-wait-strategy";
 
 /**
  * WiremockTestContainer is a test container that runs a Wiremock server for testing purposes.
