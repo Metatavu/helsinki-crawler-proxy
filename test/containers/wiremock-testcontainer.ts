@@ -1,5 +1,5 @@
 import { GenericContainer, type StartedNetwork, type StartedTestContainer, type TestContainer } from "testcontainers";
-∂import { BodyType, WireMock } from "wiremock-captain";
+import { BodyType, WireMock } from "wiremock-captain";
 import ResourceUtils from "../utils/resource-utils";
 
 /**
