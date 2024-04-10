@@ -12,11 +12,11 @@ spec:
   ipFamilyPolicy: SingleStack
   ports:
   - name: http
-    port: 3000
+    port: {{ .Values.service.http.port }}
     protocol: TCP
     targetPort: 3000
   - name: https
-    port: 3443
+    port: {{ .Values.service.https.port }}
     protocol: TCP
     targetPort: 3443
   selector:

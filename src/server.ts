@@ -111,14 +111,14 @@ if (!config.interceptors.disable) {
     ctx.onResponseEnd((ctx, callback) => {
       const responseHeaders = ctx.serverToProxyResponse?.headers;
       const responseBody = Buffer.concat(chunks);
-      const resnposeStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
+      const responseStatusCode: number = ctx.serverToProxyResponse?.statusCode || 500;
       const responseContentType = responseHeaders?.["content-type"];
-      const responseIsOk = resnposeStatusCode >= 200 && resnposeStatusCode <= 299;
+      const responseIsOk = responseStatusCode >= 200 && responseStatusCode <= 299;
       const responseIsHtml = responseContentType?.includes("text/html");
 
       Logging.log(
         "debug",
-        `Response from: ${requestUrl}. Status code: ${resnposeStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
+        `Response from: ${requestUrl}. Status code: ${responseStatusCode}, Content-Type: ${responseContentType}, Response Size (bytes): ${responseBody.length}`,
       );
 
       if (responseIsOk && responseIsHtml) {
