@@ -55,7 +55,10 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
   Logging.log("error", message);
 
   if (Logging.level === "debug") {
-    console.log("active connections", ACTIVE_CONNECTIONS.map((url) => url.toString()));
+    console.log(
+      "active connections",
+      ACTIVE_CONNECTIONS.map((url) => url.toString()),
+    );
   }
 });
 
