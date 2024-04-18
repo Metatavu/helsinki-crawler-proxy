@@ -6,6 +6,8 @@ import config from "./config";
 import interceptors from "./interceptors";
 import Logging from "./logging";
 
+const ACTIVE_CONNECTIONS: URL[] = [];
+
 /**
  * Load the CA certificate and keys
  */
@@ -44,11 +46,6 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
     return;
   }
 
-  if (errorKind === "PROXY_TO_PROXY_SOCKET_ERROR") {
-    // PROXY_TO_PROXY_SOCKET_ERROR is a common connection error that can be ignored
-    return;
-  }
-
   const host = ctx?.clientToProxyRequest.headers.host;
   const url = ctx?.clientToProxyRequest.url;
   const requestUrl = host && url ? `${host}${url}` : "unknown";
@@ -56,6 +53,10 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
   const message = `proxy error: ${err} (${errorKind}) for ${requestUrl}`;
 
   Logging.log("error", message);
+
+  if (Logging.level === "debug") {
+    console.log("active connections", ACTIVE_CONNECTIONS.map((url) => url.toString()));
+  }
 });
 
 if (config.security.username && config.security.password) {
@@ -97,6 +98,8 @@ if (!config.interceptors.disable) {
 
     Logging.log("debug", `Request to: ${requestUrl}`);
 
+    ACTIVE_CONNECTIONS.push(requestUrl);
+
     const { clientToProxyRequest } = ctx;
     const { headers } = clientToProxyRequest;
     const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers, requestUrl));
@@ -134,6 +137,8 @@ if (!config.interceptors.disable) {
       } else {
         ctx.proxyToClientResponse.write(responseBody);
       }
+
+      ACTIVE_CONNECTIONS.splice(ACTIVE_CONNECTIONS.indexOf(requestUrl), 1);
 
       return callback();
     });
