@@ -69,7 +69,7 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
  * @param headers the headers of the request
  * @returns true if the request is authenticated, false otherwise
  */
-const proxyAuthenicate = (headers: IncomingHttpHeaders): boolean => {
+const proxyAuthenticate = (headers: IncomingHttpHeaders): boolean => {
   if (!config.security.username && !config.security.password) {
     return true;
   }
@@ -94,7 +94,7 @@ if (config.security.username && config.security.password) {
    * Proxy connect handler. Method is used to authenticate the user
    */
   mitmProxy.onConnect((req, socket, _head, callback) => {
-    if (proxyAuthenicate(req.headers)) {
+    if (proxyAuthenticate(req.headers)) {
       return callback();
     }
 
@@ -116,7 +116,7 @@ if (!config.interceptors.disable) {
     const { headers } = clientToProxyRequest;
     const { host } = headers;
 
-    if (!ctx.isSSL && !proxyAuthenicate(headers)) {
+    if (!ctx.isSSL && !proxyAuthenticate(headers)) {
       return callback(new Error("Authentication required"));
     }
 
