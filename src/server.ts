@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import type { IncomingHttpHeaders } from "node:http";
 import path from "node:path";
 import * as cheerio from "cheerio";
 import { type IContext, type MaybeError, Proxy as MitmProxy } from "http-mitm-proxy";
@@ -62,21 +63,39 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
   }
 });
 
+/**
+ * Authenticate the request using the proxy-authorization header
+ *
+ * @param headers the headers of the request
+ * @returns true if the request is authenticated, false otherwise
+ */
+const proxyAuthenticate = (headers: IncomingHttpHeaders): boolean => {
+  if (!config.security.username && !config.security.password) {
+    return true;
+  }
+
+  const proxyAuth = headers["proxy-authorization"] || "";
+  const [type, encoded] = proxyAuth.split(" ");
+
+  if (type.toLowerCase() === "basic") {
+    const decoded = Buffer.from(encoded, "base64").toString("utf8");
+    const [username, password] = decoded.split(":");
+
+    if (username === config.security.username && password === config.security.password) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 if (config.security.username && config.security.password) {
   /**
    * Proxy connect handler. Method is used to authenticate the user
    */
   mitmProxy.onConnect((req, socket, _head, callback) => {
-    const proxyAuth = req.headers["proxy-authorization"] || "";
-    const [type, encoded] = proxyAuth.split(" ");
-
-    if (type.toLowerCase() === "basic") {
-      const decoded = Buffer.from(encoded, "base64").toString("utf8");
-      const [username, password] = decoded.split(":");
-
-      if (username === config.security.username && password === config.security.password) {
-        return callback();
-      }
+    if (proxyAuthenticate(req.headers)) {
+      return callback();
     }
 
     socket.write("HTTP/1.1 407 Proxy Authentication Required\r\n");
@@ -92,8 +111,14 @@ if (!config.interceptors.disable) {
    */
   mitmProxy.onRequest((ctx, callback) => {
     const protocol = ctx.isSSL ? "https" : "http";
-    const host = ctx.clientToProxyRequest.headers.host;
     const url = ctx.clientToProxyRequest.url;
+    const { clientToProxyRequest } = ctx;
+    const { headers } = clientToProxyRequest;
+    const { host } = headers;
+
+    if (!ctx.isSSL && !proxyAuthenticate(headers)) {
+      return callback(new Error("Authentication required"));
+    }
 
     ctx.use(MitmProxy.gunzip);
 
@@ -103,8 +128,6 @@ if (!config.interceptors.disable) {
 
     ACTIVE_CONNECTIONS.push(requestUrl);
 
-    const { clientToProxyRequest } = ctx;
-    const { headers } = clientToProxyRequest;
     const requestInterceptors = interceptors.filter((interceptor) => interceptor.shouldIntercept(headers, requestUrl));
 
     const chunks: Buffer[] = [];
