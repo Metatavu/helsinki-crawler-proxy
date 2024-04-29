@@ -26,3 +26,11 @@ readinessProbe:
   periodSeconds: 5
   successThreshold: 1
   timeoutSeconds: 3
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
