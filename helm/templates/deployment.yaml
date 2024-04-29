@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-helsinki-crawler-proxy
+  namespace: {{ .Release.Namespace }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-helsinki-crawler-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Release.Name }}-helsinki-crawler-proxy
+    spec:
+      containers:
+      - image: {{ .Values.image.repository }}@{{ .Values.image.sha256 }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: {{ .Release.Name }}-helsinki-crawler-proxy
+        env:
+          - name: CA_CERTIFICATE
+            value: /etc/pki/ca/ca.pem
+          - name: CA_PRIVATE_KEY
+            value: /etc/pki/ca/ca.private.key
+          - name: CA_PUBLIC_KEY
+            value: /etc/pki/ca/ca.public.key
+          - name: CA_CACHE_DIR
+            value: /tmp/cacache
+          - name: USERNAME
+            value: {{ .Values.credentials.username }}
+          - name: PASSWORD
+            value: {{ .Values.credentials.password }}
+          - name: LOGGING_LEVEL
+            value: "debug"
+          - name: NODE_ENV
+            value: "production"
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        - containerPort: 3443
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureTreshold }}
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureTreshold }}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+        volumeMounts:
+        - name: certificates
+          mountPath: "/etc/pki/ca"
+          readOnly: true
+      volumes:
+      - name: certificates
+        configMap:
+          name: {{ .Release.Name }}-helsinki-crawler-proxy-certificates

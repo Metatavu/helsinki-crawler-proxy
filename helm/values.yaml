@@ -1,0 +1,36 @@
+replicaCount: 1
+
+service:
+  http:
+    entrypoint: web
+    http: 80
+  https:
+    entrypoint: websecure
+    https: 443
+
+image:
+  repository: ghcr.io/metatavu/helsinki-crawler-proxy
+  pullPolicy: Always
+  sha256: __CHANGE_ME__
+
+livenessProbe:
+  failureTreshold: 3
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 3
+
+readinessProbe:
+  failureTreshold: 3
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 3
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

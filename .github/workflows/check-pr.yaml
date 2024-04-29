@@ -1,0 +1,23 @@
+name: Release Charts
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: Run Biome
+        run: biome ci .
+      - name: Docker pull
+        run: docker pull quay.io/curl/curl:8.7.1
+      - name: Run tests
+        run: npm install && npm test

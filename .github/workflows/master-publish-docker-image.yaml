@@ -1,0 +1,77 @@
+name: Publish to master
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  REGISTRY: ghcr.io
+  GITHUB_REPOSITORY: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    environment: master
+    runs-on: ubuntu-latest    
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve docker image name
+        id: image_name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
+          
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.image_name.outputs.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        id: dockerpush
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: 'Setup gcloud auth'
+        id: 'gcloud-auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
+
+      - name: "Setup gcloud CLI" 
+        id: 'gcloud-setup'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: "Decrypt SSH key"
+        run: |
+          echo "${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}" | base64 --decode > key && 
+          echo "${{ secrets.GCLOUD_SSH_PUBLIC_KEY }}" | base64 --decode > key.pub && 
+          chmod 400 key && 
+          chmod 400 key.pub
+
+      - name: 'Set up gcloud CLI'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 'Update deployment'
+        run: 'gcloud compute ssh ${{ secrets.GCLOUD_USER }}@helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "/home/${{ secrets.GCLOUD_USER }}/update/update.sh ${{ github.ref_name }} production ${{ steps.dockerpush.outputs.digest }}"'
+        

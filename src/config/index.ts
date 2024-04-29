@@ -1,13 +1,42 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import { bool, cleanEnv, num, str } from "envalid";
 
 dotenv.config();
 
-export const config = {
-  proxy: {
-    host: process.env.PROXY_HOST || 'example-proxy.metatavu.io',
-    port: process.env.PROXY_PORT ? parseInt(process.env.PROXY_PORT, 10) : 3128,
-    protocol: process.env.PROXY_PROTOCOL || 'https',
-    username: process.env.PROXY_USERNAME || 'proxyuser',
-    password: process.env.PROXY_PASSWORD || 'proxypass',
+const env = cleanEnv(process.env, {
+  HTTP_PORT: num({ default: 3000 }),
+  HTTPS_PORT: num({ default: 3443 }),
+  LOGGING_LEVEL: str({ default: "info" }),
+  CA_CACHE_DIR: str({ default: undefined }),
+  CA_CERTIFICATE: str({ devDefault: "/tmp/ca/cert.pem" }),
+  CA_PRIVATE_KEY: str({ devDefault: "/tmp/ca/key.pem" }),
+  CA_PUBLIC_KEY: str({ devDefault: "/tmp/ca/public.pem" }),
+  USERNAME: str({ default: undefined }),
+  PASSWORD: str({ default: undefined }),
+  DISABLE_INTERCEPTORS: bool({ default: false }),
+});
+
+export default {
+  interceptors: {
+    disable: env.DISABLE_INTERCEPTORS,
+  },
+  logging: {
+    level: env.LOGGING_LEVEL,
+  },
+  http: {
+    port: env.HTTP_PORT,
+  },
+  https: {
+    port: env.HTTPS_PORT,
+  },
+  ca: {
+    cacheDir: env.CA_CACHE_DIR,
+    certificate: env.CA_CERTIFICATE,
+    privateKey: env.CA_PRIVATE_KEY,
+    publicKey: env.CA_PUBLIC_KEY,
+  },
+  security: {
+    username: env.USERNAME,
+    password: env.PASSWORD,
   },
 };
