@@ -1,11 +1,11 @@
 import fs from "node:fs";
+import type { IncomingHttpHeaders } from "node:http";
 import path from "node:path";
 import * as cheerio from "cheerio";
 import { type IContext, type MaybeError, Proxy as MitmProxy } from "http-mitm-proxy";
 import config from "./config";
 import interceptors from "./interceptors";
 import Logging from "./logging";
-import { IncomingHttpHeaders } from "node:http";
 
 const ACTIVE_CONNECTIONS: URL[] = [];
 
@@ -65,7 +65,7 @@ mitmProxy.onError((ctx: IContext | null, err?: MaybeError, errorKind?: string) =
 
 /**
  * Authenticate the request using the proxy-authorization header
- * 
+ *
  * @param headers the headers of the request
  * @returns true if the request is authenticated, false otherwise
  */
@@ -84,10 +84,10 @@ const proxyAuthenicate = (headers: IncomingHttpHeaders): boolean => {
     if (username === config.security.username && password === config.security.password) {
       return true;
     }
-  };
+  }
 
   return false;
-}
+};
 
 if (config.security.username && config.security.password) {
   /**
@@ -119,7 +119,7 @@ if (!config.interceptors.disable) {
     if (!ctx.isSSL && !proxyAuthenicate(headers)) {
       return callback(new Error("Authentication required"));
     }
-    
+
     ctx.use(MitmProxy.gunzip);
 
     const requestUrl = new URL(`${protocol}://${host}${url}`);
