@@ -18,6 +18,6 @@ jobs:
       - name: Run Biome
         run: biome ci .
       - name: Docker pull
-        run: docker pull quay.io/curl/curl:8.7.1
+        run: docker pull quay.io/curl/curl:8.10.1
       - name: Run tests
         run: npm install && npm test
