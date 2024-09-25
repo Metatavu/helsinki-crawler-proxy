@@ -1,4 +1,4 @@
-FROM node:20.12.0-alpine3.19 AS builder
+FROM node:22.7.0-alpine3.19 AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -6,7 +6,7 @@ COPY src ./src
 RUN npm install
 RUN npm run build
 
-FROM node:20.12.0-alpine3.19
+FROM node:22.7.0-alpine3.19
 WORKDIR /usr/src/app
 RUN apk update
 RUN apk add curl
