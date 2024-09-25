@@ -1,6 +1,7 @@
 import type { IncomingHttpHeaders } from "node:http";
 import { env } from "node:process";
-import type * as cheerio from "cheerio";
+import { Element } from 'domhandler';
+import cheerio from 'cheerio';
 import type AbstractProxyRequestInterceptor from "./abstract-proxy-request-interceptor";
 
 /**
@@ -69,7 +70,7 @@ export default class BreadcrumbsRequestInterceptor implements AbstractProxyReque
    */
   private detectBreadcrumbsFromHelOld = (
     $: cheerio.CheerioAPI,
-    helBreadcrumbsOld: cheerio.Cheerio<cheerio.Element>,
+    helBreadcrumbsOld: cheerio.Cheerio<Element>,
   ) => {
     const result = [];
 
@@ -91,7 +92,7 @@ export default class BreadcrumbsRequestInterceptor implements AbstractProxyReque
    */
   private detectBreadcrumbsFromHelNew = (
     $: cheerio.CheerioAPI,
-    helBreadcrumbsNew: cheerio.Cheerio<cheerio.Element>,
+    helBreadcrumbsNew: cheerio.Cheerio<Element>,
   ) => {
     const result = [];
 
