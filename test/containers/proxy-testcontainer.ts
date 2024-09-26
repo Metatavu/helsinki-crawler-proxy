@@ -61,9 +61,15 @@ export default class ProxyTestContainer {
    */
   private async build() {
     const context = path.join(__dirname, "..", "..");
-    this.proxyContainer = (await GenericContainer.fromDockerfile(context).build())
-      .withEnvironment({ NODE_ENV: "e2e", LOGGING_LEVEL: "debug" })
-      .withExposedPorts(3000)
-      .withNetworkAliases("proxy");
+
+    try {
+      this.proxyContainer = (await GenericContainer.fromDockerfile(context).build())
+        .withEnvironment({ NODE_ENV: "e2e", LOGGING_LEVEL: "debug" })
+        .withExposedPorts(3000)
+        .withNetworkAliases("proxy");
+    } catch (error) {
+      console.error("Error building proxy container Docker image:", error);
+      throw error;
+    }
   }
 }

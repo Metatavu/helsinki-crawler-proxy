@@ -13,7 +13,7 @@ export default class WiremockTestContainer {
    * Creates a new WiremockTestContainer.
    */
   constructor() {
-    this.wiremockContainer = new GenericContainer("wiremock/wiremock:3.5.2")
+    this.wiremockContainer = new GenericContainer("wiremock/wiremock:3.9.1")
       .withExposedPorts(8080)
       .withNetworkAliases("wiremock");
   }
