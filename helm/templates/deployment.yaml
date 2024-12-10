@@ -37,13 +37,13 @@ spec:
           - name: USERNAME
             valueFrom:
               secretKeyRef:
-              name: {{ .Release.Name }}-credentials
-              key: username
+                name: {{ .Release.Name }}-credentials
+                key: username
           - name: PASSWORD
             valueFrom:
               secretKeyRef:
-              name: {{ .Release.Name }}-credentials
-              key: password
+                name: {{ .Release.Name }}-credentials
+                key: password
           - name: LOGGING_LEVEL
             value: "debug"
           - name: NODE_ENV
