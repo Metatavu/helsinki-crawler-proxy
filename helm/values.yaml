@@ -35,7 +35,7 @@ resources:
     cpu: 100m
     memory: 128Mi
 
-secret-store:
+secretStore:
   server: server-address
   path: token-path
-  token-ref: token-ref
+  tokenRef: token-ref
