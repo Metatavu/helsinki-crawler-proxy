@@ -67,7 +67,7 @@ jobs:
         uses: azure/setup-helm@v3
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
-      - name: Install Chart
+      - name: Install Chart 
         uses: WyriHaximus/github-action-helm3@v3
         with:
           exec: |
