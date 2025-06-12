@@ -68,8 +68,7 @@ jobs:
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
       - name: Install Chart 
-        with:
-          exec: |
+        run: |
             echo "replicaCount: 1" >> new-values.yaml &&
             echo "image:" >> new-values.yaml &&
             echo "  sha256: ${{ steps.dockerpush.outputs.digest }}" >> new-values.yaml &&
