@@ -83,11 +83,11 @@ jobs:
             echo "  limits: " >> new-values.yaml &&
             echo "    cpu: 250m" >> new-values.yaml &&
             echo "    memory: 1Gi" >> new-values.yaml &&
-            echo "  requests: " >> new-values.yaml &&
+            echo "  requests: "  >> new-values.yaml &&
             echo "    cpu: 50m" >> new-values.yaml &&
             echo "    memory: 256Mi" >> new-values.yaml &&
             echo "secretStore:" >> new-values.yaml &&
             echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
             echo "  path: helsinki/crawler-proxy/staging/kv" >> new-values.yaml &&
             echo "  tokenRef: staging-hcv-token" >> new-values.yaml &&
-            helm upgrade staging . -f new-values.yaml -n staging
+            helm upgrade staging /home/${{ secrets.GCLOUD_USER }}/git/helsinki-crawler-proxy/helm  -f new-values.yaml -n staging
