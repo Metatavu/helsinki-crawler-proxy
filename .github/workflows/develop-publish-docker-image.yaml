@@ -83,7 +83,7 @@ jobs:
             echo "  limits: " >> new-values.yaml &&
             echo "    cpu: 250m" >> new-values.yaml &&
             echo "    memory: 1Gi" >> new-values.yaml &&
-            echo "  requests: "  >> new-values.yaml &&
+            echo "  requests: " >> new-values.yaml &&
             echo "    cpu: 50m" >> new-values.yaml &&
             echo "    memory: 256Mi" >> new-values.yaml &&
             echo "secretStore:" >> new-values.yaml &&
