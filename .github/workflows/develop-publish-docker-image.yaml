@@ -71,4 +71,25 @@ jobs:
         uses: WyriHaximus/github-action-helm3@v3
         with:
           exec: |
-            helm list -n staging
+            echo "replicaCount: 1" >> new-values.yaml &&
+            echo "image:" >> new-values.yaml &&
+            echo "  sha256: ${{ steps.dockerpush.outputs.digest }}" >> new-values.yaml &&
+            echo "service: " >> new-values.yaml &&
+            echo "  http: " >> new-values.yaml &&
+            echo "    entrypoint: staproxy" >> new-values.yaml &&
+            echo "    port: 3000" >> new-values.yaml &&
+            echo "  https: " >> new-values.yaml &&
+            echo "    entrypoint: staproxysecure" >> new-values.yaml &&
+            echo "    port: 3443" >> new-values.yaml &&
+            echo "resources: " >> new-values.yaml &&
+            echo "  limits: " >> new-values.yaml &&
+            echo "    cpu: 250m" >> new-values.yaml &&
+            echo "    memory: 1Gi" >> new-values.yaml &&
+            echo "  requests: " >> new-values.yaml &&
+            echo "    cpu: 50m" >> new-values.yaml &&
+            echo "    memory: 256Mi" >> new-values.yaml &&
+            echo "secretStore:" >> new-values.yaml &&
+            echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
+            echo "  path: helsinki/crawler-proxy/staging/kv" >> new-values.yaml &&
+            echo "  tokenRef: staging-hcv-token" >> new-values.yaml &&
+            helm upgrade staging . -f new-values.yaml -n staging
