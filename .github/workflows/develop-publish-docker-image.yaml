@@ -68,7 +68,6 @@ jobs:
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
       - name: Install Chart 
-        uses: WyriHaximus/github-action-helm3@v3
         with:
           exec: |
             echo "replicaCount: 1" >> new-values.yaml &&
