@@ -51,27 +51,43 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: 'Setup gcloud auth'
-        id: 'gcloud-auth'
-        uses: 'google-github-actions/auth@v2'
+  helm-deploy:
+    environment: master
+    needs: build-and-push-image
+    runs-on: helsinki-crawler-proxy-production-arc-runners
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
-
-      - name: "Setup gcloud CLI" 
-        id: 'gcloud-setup'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: "Decrypt SSH key"
+          ref: master
+      - name: Install ARC dependencies
         run: |
-          echo "${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}" | base64 --decode > key && 
-          echo "${{ secrets.GCLOUD_SSH_PUBLIC_KEY }}" | base64 --decode > key.pub && 
-          chmod 400 key && 
-          chmod 400 key.pub
-
-      - name: 'Set up gcloud CLI'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: 'Update deployment'
-        run: 'gcloud compute ssh ${{ secrets.GCLOUD_USER }}@helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "/home/${{ secrets.GCLOUD_USER }}/update/update.sh ${{ github.ref_name }} production ${{ steps.dockerpush.outputs.digest }}"'
-        
+          sudo apt update && sudo apt install -y zip
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+      - name: Install Chart 
+        run: |
+            echo "replicaCount: 1" >> new-values.yaml &&
+            echo "image:" >> new-values.yaml &&
+            echo "  sha256: ${{ steps.dockerpush.outputs.digest }}" >> new-values.yaml &&
+            echo "service: " >> new-values.yaml &&
+            echo "  http: " >> new-values.yaml &&
+            echo "    entrypoint: staproxy" >> new-values.yaml &&
+            echo "    port: 3000" >> new-values.yaml &&
+            echo "  https: " >> new-values.yaml &&
+            echo "    entrypoint: staproxysecure" >> new-values.yaml &&
+            echo "    port: 3443" >> new-values.yaml &&
+            echo "resources: " >> new-values.yaml &&
+            echo "  limits: " >> new-values.yaml &&
+            echo "    cpu: 250m" >> new-values.yaml &&
+            echo "    memory: 1Gi" >> new-values.yaml &&
+            echo "  requests: " >> new-values.yaml &&
+            echo "    cpu: 50m" >> new-values.yaml &&
+            echo "    memory: 256Mi" >> new-values.yaml &&
+            echo "secretStore:" >> new-values.yaml &&
+            echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
+            echo "  path: helsinki/crawler-proxy/production/kv" >> new-values.yaml &&
+            echo "  tokenRef: production-hcv-token" >> new-values.yaml &&
+            helm upgrade production ./helm  -f new-values.yaml -n producion
