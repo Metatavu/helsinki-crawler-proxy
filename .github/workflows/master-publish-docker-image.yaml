@@ -80,13 +80,14 @@ jobs:
               ${{ secrets.VAULT_PATH }} MEMORY_LIMIT | MEMORY_LIMIT ;
               ${{ secrets.VAULT_PATH }} CPU_REQUESTS | CPU_REQUESTS ;
               ${{ secrets.VAULT_PATH }} MEMORY_REQUESTS | MEMORY_REQUESTS ;
+              ${{ secrets.VAULT_PATH }} REPLICAS | REPLICAS ;
       - name: Install Helm
         uses: azure/setup-helm@v3
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
       - name: Install Chart 
         run: |
-            echo "replicaCount: 3" >> new-values.yaml &&
+            echo "replicaCount: ${{ env.REPLICAS }}" >> new-values.yaml &&
             echo "image:" >> new-values.yaml &&
             echo "  sha256: ${{ needs.build-and-push-image.outputs.image_digest }}" >> new-values.yaml &&
             echo "service: " >> new-values.yaml &&
@@ -98,11 +99,11 @@ jobs:
             echo "    port: ${{ env.HTTPS_PORT }}" >> new-values.yaml &&
             echo "resources: " >> new-values.yaml &&
             echo "  limits: " >> new-values.yaml &&
-            echo "    cpu: 500m" >> new-values.yaml &&
-            echo "    memory: 2Gi" >> new-values.yaml &&
+            echo "    cpu: ${{ env.CPU_LIMIT }}" >> new-values.yaml &&
+            echo "    memory: ${{ env.MEMORY_LIMIT }}" >> new-values.yaml &&
             echo "  requests: " >> new-values.yaml &&
-            echo "    cpu: 100m" >> new-values.yaml &&
-            echo "    memory: 512Mi" >> new-values.yaml &&
+            echo "    cpu: ${{ env.CPU_REQUESTS }}" >> new-values.yaml &&
+            echo "    memory: ${{ env.MEMORY_REQUESTS }}" >> new-values.yaml &&
             echo "secretStore:" >> new-values.yaml &&
             echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
             echo "  path: helsinki/crawler-proxy/production/kv" >> new-values.yaml &&
