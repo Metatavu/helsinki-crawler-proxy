@@ -80,10 +80,9 @@ jobs:
         uses: azure/setup-kubectl@v1
       - name: Install Chart 
         run: |
-            echo ${{ needs.build-and-push-image.steps.dockerpush }}
             echo "replicaCount: 1" >> new-values.yaml &&
             echo "image:" >> new-values.yaml &&
-            echo "  sha256: ${{ needs.build-and-push-image.outputs.image-digest }}" >> new-values.yaml &&
+            echo "  sha256: ${{ needs.build-and-push-image.steps.dockerpush.outputs.digest }}" >> new-values.yaml &&
             echo "service: " >> new-values.yaml &&
             echo "  http: " >> new-values.yaml &&
             echo "    entrypoint: ${{ env.ENTRYPOINT_HTTP }}" >> new-values.yaml &&
