@@ -9,7 +9,7 @@ describe("News published request interceptor test suite", () => {
 
     for (const url of ResourceUtils.getTestHelFiUrls()) {
       const headers = ResourceUtils.getRequestHeadersForUrl(url);
-      expect(interceptor.shouldIntercept(headers)).toBe(true);
+      expect(interceptor.shouldIntercept(headers, url)).toBe(true);
     }
   });
 
@@ -18,7 +18,7 @@ describe("News published request interceptor test suite", () => {
 
     for (const url of ResourceUtils.getOtherTestUrls()) {
       const headers = ResourceUtils.getRequestHeadersForUrl(url);
-      expect(interceptor.shouldIntercept(headers)).toBe(false);
+      expect(interceptor.shouldIntercept(headers, url)).toBe(false);
     }
   });
 

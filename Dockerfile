@@ -1,4 +1,4 @@
-FROM node:22.12.0-alpine3.21 AS builder
+FROM node:22.16.0-alpine3.21 AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -6,7 +6,7 @@ COPY src ./src
 RUN npm install
 RUN npm run build
 
-FROM node:22.12.0-alpine3.21
+FROM node:22.16.0-alpine3.21
 WORKDIR /usr/src/app
 RUN apk update
 RUN apk add curl

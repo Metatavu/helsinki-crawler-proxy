@@ -5,7 +5,7 @@ This is a simple proxy application built with Node.js and Express.js. It allows 
 ## Features
 
 - Proxy HTTP requests to a target URL
-- Modify response headers and body
+- Modify response headers and body 
 - Support for custom schema parameters in response payload
 
 ## Getting Started
@@ -79,6 +79,7 @@ For example:
 ```
 curl --head --proxy http://localhost:3000 http://www.google.com
 ```
+
 
 This command will send a `HEAD` request to `http://www.google.com` through the proxy server running on `http://localhost:3000`.
 

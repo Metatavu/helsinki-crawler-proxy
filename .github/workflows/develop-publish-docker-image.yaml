@@ -11,6 +11,8 @@ env:
 
 jobs:
   build-and-push-image:
+    outputs:
+      image_digest: ${{ steps.dockerpush.outputs.digest }}
     environment: develop
     runs-on: ubuntu-latest    
     permissions:
@@ -51,27 +53,62 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: 'Setup gcloud auth'
-        id: 'gcloud-auth'
-        uses: 'google-github-actions/auth@v2'
+  helm-deploy:
+    environment: develop
+    needs: build-and-push-image
+    runs-on: helsinki-crawler-proxy-staging-arc-runners
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.GCLOUD_WORKER_IDENTITY_PROVIDER }}
-
-      - name: "Setup gcloud CLI" 
-        id: 'gcloud-setup'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: "Decrypt SSH key"
+          ref: develop
+      - name: Install ARC dependencies
         run: |
-          echo "${{ secrets.GCLOUD_SSH_PRIVATE_KEY }}" | base64 --decode > key && 
-          echo "${{ secrets.GCLOUD_SSH_PUBLIC_KEY }}" | base64 --decode > key.pub && 
-          chmod 400 key && 
-          chmod 400 key.pub
-
-      - name: 'Set up gcloud CLI'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: 'Update deployment'
-        run: 'gcloud compute ssh ${{ secrets.GCLOUD_USER }}@helsinki-crawler-proxy --zone ${{ secrets.GCLOUD_ZONE }} --project=${{ secrets.GCLOUD_PROJECT_ID }} --ssh-key-file=key --tunnel-through-iap --command "/home/${{ secrets.GCLOUD_USER }}/update/update.sh ${{ github.ref_name }} staging ${{ steps.dockerpush.outputs.digest }}"'
-        
+          sudo apt update && sudo apt install -y zip
+      - name: Import Secrets
+        id: import-secrets
+        uses: hashicorp/vault-action@v2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+              ${{ secrets.VAULT_PATH }} ENTRYPOINT_HTTP | ENTRYPOINT_HTTP ;
+              ${{ secrets.VAULT_PATH }} ENTRYPOINT_HTTPS | ENTRYPOINT_HTTPS ;
+              ${{ secrets.VAULT_PATH }} HTTP_PORT | HTTP_PORT ;
+              ${{ secrets.VAULT_PATH }} HTTPS_PORT | HTTPS_PORT ;
+              ${{ secrets.VAULT_PATH }} CPU_LIMIT | CPU_LIMIT ;
+              ${{ secrets.VAULT_PATH }} MEMORY_LIMIT | MEMORY_LIMIT ;
+              ${{ secrets.VAULT_PATH }} CPU_REQUESTS | CPU_REQUESTS ;
+              ${{ secrets.VAULT_PATH }} MEMORY_REQUESTS | MEMORY_REQUESTS ;
+              ${{ secrets.VAULT_PATH }} REPLICAS | REPLICAS ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_ADDRESS | SECRET_STORE_ADDRESS ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_PATH | SECRET_STORE_PATH ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_TOKEN_NAME | SECRET_STORE_TOKEN_NAME ;
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+      - name: Install Chart 
+        run: |
+            echo "replicaCount: ${{ env.REPLICAS }}" >> new-values.yaml &&
+            echo "image:" >> new-values.yaml &&
+            echo "  sha256: ${{ needs.build-and-push-image.outputs.image_digest }}" >> new-values.yaml &&
+            echo "service: " >> new-values.yaml &&
+            echo "  http: " >> new-values.yaml &&
+            echo "    entrypoint: ${{ env.ENTRYPOINT_HTTP }}" >> new-values.yaml &&
+            echo "    port: ${{ env.HTTP_PORT }}" >> new-values.yaml &&
+            echo "  https: " >> new-values.yaml &&
+            echo "    entrypoint: ${{ env.ENTRYPOINT_HTTPS }}" >> new-values.yaml &&
+            echo "    port: ${{ env.HTTPS_PORT }}" >> new-values.yaml &&
+            echo "resources: " >> new-values.yaml &&
+            echo "  limits: " >> new-values.yaml &&
+            echo "    cpu: ${{ env.CPU_LIMIT }}" >> new-values.yaml &&
+            echo "    memory: ${{ env.MEMORY_LIMIT }}" >> new-values.yaml &&
+            echo "  requests: " >> new-values.yaml &&
+            echo "    cpu: ${{ env.CPU_REQUESTS }}" >> new-values.yaml &&
+            echo "    memory: ${{ env.MEMORY_REQUESTS }}" >> new-values.yaml &&
+            echo "secretStore:" >> new-values.yaml &&
+            echo "  server: ${{ env.SECRET_STORE_ADDRESS }}" >> new-values.yaml &&
+            echo "  path: ${{ env.SECRET_STORE_PATH }}" >> new-values.yaml &&
+            echo "  tokenRef: ${{ env.SECRET_STORE_TOKEN_NAME }}" >> new-values.yaml &&
+            helm upgrade staging ./helm  -f new-values.yaml -n staging

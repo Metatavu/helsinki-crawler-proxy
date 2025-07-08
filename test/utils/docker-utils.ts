@@ -23,7 +23,7 @@ namespace DockerUtils {
     return new Promise((resolve, reject) => {
       docker
         .createContainer({
-          Image: "quay.io/curl/curl:8.11.0",
+          Image: "quay.io/curl/curl:8.13.0",
           Cmd: ["sh", "-c", `curl ${params.join(" ")} > /tmp/output`],
           AttachStdout: true,
           AttachStderr: true,
