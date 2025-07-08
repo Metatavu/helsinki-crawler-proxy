@@ -81,6 +81,9 @@ jobs:
               ${{ secrets.VAULT_PATH }} CPU_REQUESTS | CPU_REQUESTS ;
               ${{ secrets.VAULT_PATH }} MEMORY_REQUESTS | MEMORY_REQUESTS ;
               ${{ secrets.VAULT_PATH }} REPLICAS | REPLICAS ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_ADDRESS | SECRET_STORE_ADDRESS ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_PATH | SECRET_STORE_PATH ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_TOKEN_NAME | SECRET_STORE_TOKEN_NAME ;
       - name: Install Helm
         uses: azure/setup-helm@v3
       - name: Set up kubectl
