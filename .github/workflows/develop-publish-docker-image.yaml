@@ -79,7 +79,7 @@ jobs:
               ${{ secrets.VAULT_PATH }} CPU_LIMIT | CPU_LIMIT ;
               ${{ secrets.VAULT_PATH }} MEMORY_LIMIT | MEMORY_LIMIT ;
               ${{ secrets.VAULT_PATH }} CPU_REQUESTS | CPU_REQUESTS ;
-              ${{ secrets.VAULT_PATH }} MEMORY_REQEUSTS | MEMORY_REQUESTS ;
+              ${{ secrets.VAULT_PATH }} MEMORY_REQUESTS | MEMORY_REQUESTS ;
       - name: Install Helm
         uses: azure/setup-helm@v3
       - name: Set up kubectl
