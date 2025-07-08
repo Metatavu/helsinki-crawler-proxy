@@ -80,7 +80,7 @@ jobs:
         uses: azure/setup-kubectl@v1
       - name: Install Chart 
         run: |
-            echo "replicaCount: 1" >> new-values.yaml &&
+            echo "replicaCount: 3" >> new-values.yaml &&
             echo "image:" >> new-values.yaml &&
             echo "  sha256: ${{ steps.dockerpush.outputs.digest }}" >> new-values.yaml &&
             echo "service: " >> new-values.yaml &&
