@@ -70,6 +70,8 @@ jobs:
           url: ${{ secrets.VAULT_ADDR }}
           token: ${{ secrets.VAULT_TOKEN }}
           secrets: |
+              ${{ secrets.VAULT_PATH }} ENTRYPOINT_HTTP | ENTRYPOINT_HTTP ;
+              ${{ secrets.VAULT_PATH }} ENTRYPOINT_HTTPS | ENTRYPOINT_HTTPS ;
               ${{ secrets.VAULT_PATH }} HTTP_PORT | HTTP_PORT ;
               ${{ secrets.VAULT_PATH }} HTTPS_PORT | HTTPS_PORT ;
       - name: Install Helm
@@ -83,10 +85,10 @@ jobs:
             echo "  sha256: ${{ steps.dockerpush.outputs.digest }}" >> new-values.yaml &&
             echo "service: " >> new-values.yaml &&
             echo "  http: " >> new-values.yaml &&
-            echo "    entrypoint: prodproxy" >> new-values.yaml &&
+            echo "    entrypoint: ${{ env.ENTRYPOINT_HTTP }}" >> new-values.yaml &&
             echo "    port: ${{ env.HTTP_PORT }}" >> new-values.yaml &&
             echo "  https: " >> new-values.yaml &&
-            echo "    entrypoint: prodproxysecure" >> new-values.yaml &&
+            echo "    entrypoint: ${{ env.ENTRYPOINT_HTTPS }}" >> new-values.yaml &&
             echo "    port: ${{ env.HTTPS_PORT }}" >> new-values.yaml &&
             echo "resources: " >> new-values.yaml &&
             echo "  limits: " >> new-values.yaml &&
