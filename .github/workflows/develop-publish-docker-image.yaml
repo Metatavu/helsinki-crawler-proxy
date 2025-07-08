@@ -94,11 +94,11 @@ jobs:
             echo "    port: ${{ env.HTTPS_PORT }}" >> new-values.yaml &&
             echo "resources: " >> new-values.yaml &&
             echo "  limits: " >> new-values.yaml &&
-            echo "    cpu: 256m" >> new-values.yaml &&
-            echo "    memory: 1Gi" >> new-values.yaml &&
+            echo "    cpu: ${{ env.CPU_LIMIT }}" >> new-values.yaml &&
+            echo "    memory: ${{ env.MEMORY_LIMIT }}" >> new-values.yaml &&
             echo "  requests: " >> new-values.yaml &&
-            echo "    cpu: 50m" >> new-values.yaml &&
-            echo "    memory: 256Mi" >> new-values.yaml &&
+            echo "    cpu: ${{ env.CPU_REQUESTS }}" >> new-values.yaml &&
+            echo "    memory: ${{ env.MEMORY_REQUESTS }}" >> new-values.yaml &&
             echo "secretStore:" >> new-values.yaml &&
             echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
             echo "  path: helsinki/crawler-proxy/staging/kv" >> new-values.yaml &&
