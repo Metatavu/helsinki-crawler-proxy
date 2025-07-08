@@ -11,6 +11,8 @@ env:
 
 jobs:
   build-and-push-image:
+    outputs:
+      image_digest: ${{ steps.dockerpush.outputs.digest }}
     environment: master
     runs-on: ubuntu-latest    
     permissions:
