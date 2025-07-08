@@ -81,6 +81,9 @@ jobs:
               ${{ secrets.VAULT_PATH }} CPU_REQUESTS | CPU_REQUESTS ;
               ${{ secrets.VAULT_PATH }} MEMORY_REQUESTS | MEMORY_REQUESTS ;
               ${{ secrets.VAULT_PATH }} REPLICAS | REPLICAS ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_ADDRESS | SECRET_STORE_ADDRESS ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_PATH | SECRET_STORE_PATH ;
+              ${{ secrets.VAULT_PATH }} SECRET_STORE_TOKEN_NAME | SECRET_STORE_TOKEN_NAME ;
       - name: Install Helm
         uses: azure/setup-helm@v3
       - name: Set up kubectl
@@ -105,7 +108,7 @@ jobs:
             echo "    cpu: ${{ env.CPU_REQUESTS }}" >> new-values.yaml &&
             echo "    memory: ${{ env.MEMORY_REQUESTS }}" >> new-values.yaml &&
             echo "secretStore:" >> new-values.yaml &&
-            echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
-            echo "  path: helsinki/crawler-proxy/staging/kv" >> new-values.yaml &&
-            echo "  tokenRef: staging-hcv-token" >> new-values.yaml &&
+            echo "  server: ${{ env.SECRET_STORE_ADDRESS }}" >> new-values.yaml &&
+            echo "  path: ${{ env.SECRET_STORE_PATH }}" >> new-values.yaml &&
+            echo "  tokenRef: ${{ env.SECRET_STORE_TOKEN_NAME }}" >> new-values.yaml &&
             helm upgrade staging ./helm  -f new-values.yaml -n staging
