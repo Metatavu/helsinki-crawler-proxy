@@ -75,17 +75,17 @@ jobs:
             echo "service: " >> new-values.yaml &&
             echo "  http: " >> new-values.yaml &&
             echo "    entrypoint: staproxy" >> new-values.yaml &&
-            echo "    port: 3000" >> new-values.yaml &&
+            echo "    port: 4000" >> new-values.yaml &&
             echo "  https: " >> new-values.yaml &&
             echo "    entrypoint: staproxysecure" >> new-values.yaml &&
-            echo "    port: 3443" >> new-values.yaml &&
+            echo "    port: 4443" >> new-values.yaml &&
             echo "resources: " >> new-values.yaml &&
             echo "  limits: " >> new-values.yaml &&
-            echo "    cpu: 250m" >> new-values.yaml &&
-            echo "    memory: 1Gi" >> new-values.yaml &&
+            echo "    cpu: 500m" >> new-values.yaml &&
+            echo "    memory: 2Gi" >> new-values.yaml &&
             echo "  requests: " >> new-values.yaml &&
-            echo "    cpu: 50m" >> new-values.yaml &&
-            echo "    memory: 256Mi" >> new-values.yaml &&
+            echo "    cpu: 100m" >> new-values.yaml &&
+            echo "    memory: 512Mi" >> new-values.yaml &&
             echo "secretStore:" >> new-values.yaml &&
             echo "  server: https://hcv.metatavu.io" >> new-values.yaml &&
             echo "  path: helsinki/crawler-proxy/production/kv" >> new-values.yaml &&
