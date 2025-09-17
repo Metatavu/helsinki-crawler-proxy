@@ -111,4 +111,4 @@ jobs:
             echo "  server: ${{ env.SECRET_STORE_ADDRESS }}" >> new-values.yaml &&
             echo "  path: ${{ env.SECRET_STORE_PATH }}" >> new-values.yaml &&
             echo "  tokenRef: ${{ env.SECRET_STORE_TOKEN_NAME }}" >> new-values.yaml &&
-            helm upgrade staging ./helm  -f new-values.yaml -n staging
+            helm install staging ./helm  -f new-values.yaml -n staging
